@@ -117,7 +117,7 @@ Első lépésként betöltjük a forrás adatokat a HDFS-ről, ezt követően j�
 
 A labor során a Cloudera Hadoop disztribúcióját fogjuk használni, amely egyetlen virtuális gépen, a [Cloudera Quickstart VM](http://www.cloudera.com/downloads/quickstart_vms/5-5.html)-en fog futni.
 Ebben a környezetben a Cloudera Hadoop disztribúció legfontosabb komponensei mind elérhetők, emiatt a virtuális gép viszonylag sok erőforrást igényel.
-A virtuális gép indítása előtt ellenőrizzük, hogy legalább 6 GB memória, illetve 2 CPU mag allokálásra került-e a gép számára.
+A virtuális gép indítása előtt ellenőrizzük, hogy legalább 6 GB memória, illetve 4 CPU mag allokálásra került-e a gép számára.
 
 Ha a gép elindult, a Hue a következő címen érhető el: `10.0.2.15:8888`.
 A virtuális gépre általánosságban igaz, hogy ahol felhasználónév/jelszó párost kér, ott a `cloudera`/`cloudera` értékek használhatók.
