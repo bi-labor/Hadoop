@@ -415,3 +415,6 @@ Készíts external adattáblát az előző feladatban betöltött felhasználói
 
 Segítség: [Spark programming guide](http://spark.apache.org/docs/latest/programming-guide.html)
 
+## Visszajelzés
+
+Kérlek, a következő anonim kérdőív kitöltésével adj visszajelzést a laborról, hogy a jövőben tudjunk javítani az esetleges problémákon. https://goo.gl/forms/U4tMZSCR7du3S6Ny2
