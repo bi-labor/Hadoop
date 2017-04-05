@@ -2,23 +2,6 @@
 
 ## Emlékeztető
 
-### Hue - [Hadoop user Experience](http://gethue.com/)
-A Hue egy webalkalmazás a Hadoop környezetekben leggyakrabban használt funkciók egyszerű, webes felületről történő kezeléséhez. A Hue a Cloudera nyílt forráskódú fejlesztése, minden Hadoop disztribúcióval kompatibilis, az egyes szolgáktatásokkal azok standard interfészein keresztül kommunikál. Az alkalmazás a következő funkcionalitást biztosítja:
-
-* HDFS böngésző
-* Hive / Impala lekérdezés szerkesztő
-* Oozie ütemező, job-ok indítása, workflow szerkesztő
-  * Spark
-  * Hive
-  * HDFS műveletek
-  * shell
-  * ...
-* Apache Solr szerkesztő / felület
-* Apache Sentry menedzsment
-* Sqoop menedzsment
-
-A Hue használatával megszabadulhatunk (az esetek nagyrészében) a parancssori interfészek kényelmetlenségeitől. 
-
 ### HDFS - [Hadoop Distributed File System](https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html)
 A Hadoop alapját két szolgáltatás képzi ezek a HDFS és a YARN. A YARN-al részletesen itt most nem foglalkozunk, röviden a Yet Another Resource Negotiator (YARN) egy erőforráskezelő szolgáltatás, ami a klaszterben található processzormagokat, memóriát és egyéb erőforrásokat szétosztja a futo job-ok közt. Mindemellett lebonyolítja és felügyeli az egyes folyamatok futását.
 
@@ -35,6 +18,23 @@ A HDFS elérésére számos mód kínálkozik:
 * Parancssori kliens
 * WebHDFS
 * Hue
+
+### Hue - [Hadoop User Experience](http://gethue.com/)
+A Hue egy webalkalmazás a Hadoop környezetekben leggyakrabban használt funkciók egyszerű, webes felületről történő kezeléséhez. A Hue a Cloudera nyílt forráskódú fejlesztése, minden Hadoop disztribúcióval kompatibilis, az egyes szolgáktatásokkal azok standard interfészein keresztül kommunikál. Az alkalmazás a következő funkcionalitást biztosítja:
+
+* HDFS böngésző
+* Hive / Impala lekérdezés szerkesztő
+* Oozie ütemező, job-ok indítása, workflow szerkesztő
+  * Spark
+  * Hive
+  * HDFS műveletek
+  * shell
+  * ...
+* Apache Solr szerkesztő / felület
+* Apache Sentry menedzsment
+* Sqoop menedzsment
+
+A Hue használatával megszabadulhatunk (az esetek nagyrészében) a parancssori interfészek kényelmetlenségeitől. 
 
 ### Hive - [Hive](https://hive.apache.org)
 
