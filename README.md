@@ -3,7 +3,9 @@
 ## Emlékeztető
 
 ### HDFS - [Hadoop Distributed File System](https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html)
-A Hadoop alapját két szolgáltatás képzi ezek a HDFS és a YARN. A YARN-al részletesen itt most nem foglalkozunk, röviden a Yet Another Resource Negotiator (YARN) egy erőforráskezelő szolgáltatás, ami a klaszterben található processzormagokat, memóriát és egyéb erőforrásokat szétosztja a futo job-ok közt. Mindemellett lebonyolítja és felügyeli az egyes folyamatok futását.
+A Hadoop alapját két szolgáltatás képezi, ezek a HDFS és a YARN.
+A YARN-al részletesen itt most nem foglalkozunk, röviden a Yet Another Resource Negotiator (YARN) egy erőforráskezelő szolgáltatás, ami a klaszterben található processzormagokat, memóriát és egyéb erőforrásokat szétosztja a futó job-ok közt.
+Mindemellett lebonyolítja és felügyeli az egyes folyamatok futását.
 
 A HDFS azaz Hadoop Distributed File System egy elosztott redundáns blokk alapú fájlrendszer. Hadoop környezetekben 95%-ban HDFS fog az adattárolás eszközeként szolgálni, erre épülnek a különböző adatbázisok és eszközök.
 
@@ -85,18 +87,18 @@ Felhasználási területei igen széleskörűek, mi egyfajta ETL eszközként fo
 
 #### Fontos fogalmak
 1. *FlowFile:* Egy FlowFile lényegében egy csomagként fogható fel, amely a rendszerben halad az egyes adatfolyamok mentén. Minden FlowFile két elemből áll össze, a metaadatokat tartalmazó attribútumokból, és a FlowFilehoz tartozó adat tartalmából.
-2. *FlowFile Processor:* A lényegi munkát a Processorok végzik el. Feladatuk lehet az adat transzformálása, routeolása, vagy betöltése valamlyen külső rendszerbe. A Processorok hozzáférnek a FlowFileok attribútumaihoz, és tartalmához is.
+2. *FlowFile Processor:* A lényegi munkát a Processorok végzik el. Feladatuk lehet az adat transzformálása, routeolása, vagy betöltése valamilyen külső rendszerbe. A Processorok hozzáférnek a FlowFileok attribútumaihoz, és tartalmához is.
 3. *Connection:* Az egyes Processorokat valamilyen módon össze kell kötni, ebben segítenek a Connectionök. Annak érdekében, hogy a különböző sebességgel működő Processorok összeköthetők legyenek, a köztük lévő kapcsolatok egyfajta várakozási sorként is működnek, melyek paraméterei konfigurálhatók. 
 4. *Flow Controller:* Egyfajta ütemezőként működik, amely az egyes Processorok számára fenntartott szálakat és erőforrásokat kezeli.
 5. *Process Group:* Feldolgozási egység, amely tartalmazhat Processorokat és Connectionöket. Fogadhat, illetve küldhet adatot az Input és Output portjain keresztül. Tipikusan a különböző absztrakciós szinten mozgó feldolgozási elemek egységbe foglalására használjuk.
 
 ### Spark - [Spark](https://spark.apache.org/)
-A Spark ma a legnépszerűb adatfeldolgozó eszköz Hadoop környezetben. A korábban igen elterjedt és nagy sikernek örvendő Map Reduce paradigmát szinte teljesen felváltotta. Térnyerése a kitűnő, Map Reduce programoknál akár százszor jobb teljesítményének valamint az egyszerű, jól használható funkcionális API-jának köszönheti. Fontos megjegyezni, hogy a Spark ezt a sebességet azzal éri el, hogy minden adatot memóriában tart így olyan adathalmazok feldolgozása, amik nem férnek be a memóriába bajos lehet.
+A Spark ma a legnépszerűb adatfeldolgozó eszköz Hadoop környezetben. A korábban igen elterjedt és nagy sikernek örvendő Map Reduce paradigmát szinte teljesen felváltotta. Térnyerése a kitűnő, MapReduce programoknál akár százszor jobb teljesítményének valamint az egyszerű, jól használható funkcionális API-jának köszönheti. Fontos megjegyezni, hogy a Spark ezt a sebességet azzal éri el, hogy minden adatot memóriában tart így olyan adathalmazok feldolgozása, amik nem férnek be a memóriába bajos lehet.
 
 A Spark megjelenésével a Hadoop elkezdett a batch alapú szemléletből nyitni a real-time foldolgozás irányába is. Ennek egyik vezér eleme a Spark Streaming, ami microbatching-el megvalósított stream feldolgozásra képes. A Spark-hoz sok további kiegészítő csomag is készült melyek gráf feldolgozási, SQL vagy gépi tanulási könyvtárakat, algoritmusokat adnak a fejleszetők kezébe. Ki és bemeneti adatforrásokat tekintve sem szenvedünk hiányt, a HDFS, HBase, Hive mind támogatott. Spark programokat Scala, Java, Python és R nyelven is lehet írni, a Spark maga Scala-ban készült. Mivel az API-ja funkcionális jellegű ezért a legszebb kódot ezt támogató nyelvekben, azaz Scala-ban vagy Python-ban lehet készíteni, teljesítmény szempontjából egyértelműen a Scala preferált.
 
 #### Egy Spark program alapjai
-Egy egyszerű Spark programban tipikusan betöltünk valamilyen adatokat egy forrásból, ezeken műveleteket hajtunk végre majd a kívánt eredményeket eltároljuk valahova. A Spark egy nagyon fontos központi figalma az RDD (Resilient Distributed Dataset), egy olyan adatszerkezet mely a kleszteren elosztottan kerül tárolásra. Ezeken az RDD-ken végezhetünk műveleteket melyeknek két típusa létezik transzformáció és akció. A transzformációk új RDD-t fognak eredményezni ilyen a mappelés, szűrés stb. Az akciók az RDD-n valamilyen aggregációt hajtanak végre, eredményük tipikusan egy szám, egy pár, egy objektum, de nem RDD. A Spark a transzformációkat lazy módon hajtja végre. Mindaddíg semmit nem csinál, amíg egy akció nem következik. Így lehetősége van a parancsok sorozatát kielemezni és optimalizálni.
+Egy egyszerű Spark programban tipikusan betöltünk valamilyen adatokat egy forrásból, ezeken műveleteket hajtunk végre majd a kívánt eredményeket eltároljuk valahova. A Spark egy nagyon fontos központi fogalma az RDD (Resilient Distributed Dataset), egy olyan adatszerkezet mely a klaszteren elosztottan kerül tárolásra. Ezeken az RDD-ken végezhetünk műveleteket, melyeknek két típusa létezik, transzformáció és akció. A transzformációk új RDD-t fognak eredményezni ilyen a mappelés, szűrés stb. Az akciók az RDD-n valamilyen aggregációt hajtanak végre, eredményük tipikusan egy szám, egy pár, egy objektum, de nem RDD. A Spark a transzformációkat lazy módon hajtja végre. Mindaddig semmit nem csinál, amíg egy akció nem következik. Így lehetősége van a parancsok sorozatát kielemezni és optimalizálni.
 
 Az alábbi kódrészlet egy szövegben számolja meg az egyes szavak előfordulásainak számát, bemutatva az imént említett főbb lépéseket.
 
@@ -125,7 +127,7 @@ A virtuális gépre általánosságban igaz, hogy ahol felhasználónév/jelszó
 A VM indítása után külön el kell indítanunk az Apache NiFi servicet is.
 Annak érdekében, hogy az Apache NiFi megfelelően működjön a virtuális gépen elérhető viszonylag szűkös erőforrások mellett is, módosítsuk a `conf/bootstrap.conf` konfigurációs fájlt olyan módon, hogy a 48-53 sor elejéről távolítsuk el a komment jeleket.
 Nyissunk meg egy terminált, és adjuk ki a következő parancsot: `/home/cloudera/Desktop/nifi-0.7.2/bin/nifi.sh start`!
-Ezzel elindítottuk az Apache Nifit, amely a `localhost:8080/nifi` címen elérhető webes felületen keresztül konfigurálható.
+Ezzel elindítottuk az Apache NiFit, amely a `localhost:8080/nifi` címen elérhető webes felületen keresztül konfigurálható.
 A laborvezető segítségével ismerkedjünk meg a felülettel.
 
 ### 1. Feladat - adatbetöltés Apache NiFivel
