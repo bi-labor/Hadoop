@@ -169,6 +169,18 @@ A laborvezető segítségével állítsuk össze ezt a Flowt is, majd ellenőriz
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy a Hueban látszódik az újonnan létrehozott fájl.
 
+#### 1.3 Feladat - Users dataset betöltése Apache NiFi segítségével
+Töltsd be a `users` adatállományt is a HDFS `/user/cloudera/users` mappába!
+A betöltés során szűrd ki a 18 év alatti felhasználókat.
+Az adatszerkezet leírása a repository `data/README` fájljában található.
+
+Tippek:
+1. A bemenő fájlt soronként érdemes feldolgozni, ehhez hasznos lehet a `SplitText` Processor.
+2. A sorokra bontott fájlt szűrés után érdemes újra összefűzni, hiszen a HDFS nagyméretű fájlok kezelésére van optimalizálva.
+3. A `GetFile` Processor a FlowFileok `filename` attribútumában eltárolja a bemenő fájl nevét. A `MergeContent` Processorban ezért jól fel tudjuk használni ezt a mezőt arra, hogy azon FlowFileokat, amelyek `filename` attribútuma megegyezik, egy FlowFileba kerüljenek befésülésre.
+
+*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy a Hueban látszódik az újonnan létrehozott fájl. Jelenjenek meg az egyes Processorok konfigurációi is!
+
 ### 2. Feladat - Hive lekérdezés az adatokon
 
 #### Táblák létrehozása
@@ -384,19 +396,7 @@ A feladat megoldása csak egy hangyányit bonyolultabb mint az előző esetben. 
 
 ## Önálló feladatok
 
-### 1. Feladat - Users dataset betöltése Apache NiFi segítségével
-Töltsd be a `users` adatállományt is a HDFS `/user/cloudera/users` mappába!
-A betöltés során szűrd ki a 18 év alatti felhasználókat.
-Az adatszerkezet leírása a repository `data/README` fájljában található.
-
-Tippek:
-1. A bemenő fájlt soronként érdemes feldolgozni, ehhez hasznos lehet a `SplitText` Processor.
-2. A sorokra bontott fájlt szűrés után érdemes újra összefűzni, hiszen a HDFS nagyméretű fájlok kezelésére van optimalizálva.
-3. A `GetFile` Processor a FlowFileok `filename` attribútumában eltárolja a bemenő fájl nevét. A `MergeContent` Processorban ezért jól fel tudjuk használni ezt a mezőt arra, hogy azon FlowFileokat, amelyek `filename` attribútuma megegyezik, egy FlowFileba kerüljenek befésülésre.
-
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy a Hueban látszódik az újonnan létrehozott fájl. Jelenjenek meg az egyes Processorok konfigurációi is!
-
-### 2. Feladat - Bonyolultabb Hive lekérdezések
+### 1. Feladat - Bonyolultabb Hive lekérdezések
 Készíts external adattáblát az előző feladatban betöltött felhasználói adatokhoz.
 
 Írj egy lekérdezést, amely kiírja a 10 legtöbbet értékelt film címét, azonosítóját és a rá érkezett értékelések számát!
@@ -407,7 +407,7 @@ Készíts external adattáblát az előző feladatban betöltött felhasználói
 
 *Ellenőrzés:* A jegyzőkönyvbe illeszd be a feladat végrehajtásához szükséges SQL parancsokat, illetve a 3 lekérdezés eredményéről egy-egy képernyőképet!
 
-### 3. Feladat - Spark programozás
+### 2. Feladat - Spark programozás
 
 Írjon Spark programot, ami kiírja a konzolra az egyedi userek számát a ratings.dat adatok alapján.
 
