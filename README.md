@@ -25,11 +25,11 @@ A Superset egy web alapú dashboard készítő eszköz, ami SQL adatforrásokat 
 * Table - Adatbázis tábla
 * Database - Adatbázis
 
-Az alkalmazásban a forrás adatbázis és annak táblái felvételét követően sliceokat definiálunk. A sliceokat dashboardokhoz rendelve különbőző felületeket készíthetünk.
+Az alkalmazásban a forrás adatbázis és annak táblái felvételét követően sliceokat definiálunk. A sliceokat dashboardokhoz rendelve különbőző felületeket készíthetünk. Az eszköz remekül használható olyan dashboardok keszítésére melyet nem IT-s ügyfeleknek szolgaltatnak adatokat. Az elkészített felületek akár könnyen egyedi weboldalakba is ágyazhatók.
 
 ### Zeppelin - [Zeppelin](https://zeppelin.apache.org/)
 
-Az Apache Zeppelin egy web alapú notebook eszköz. Könynen bővíthető architektúrájának köszönhetően számos interpreter érhető el hozzá melyekkel SQL lekérdezéseket, Python vagy éppen Spark kódrészleteket futtathatunk. Az eszköz kiválóan alkalmas data exploration feladatokra.
+Az Apache Zeppelin egy web alapú notebook eszköz. Könnyen bővíthető architektúrájának köszönhetően számos interpreter érhető el hozzá melyekkel SQL lekérdezéseket, Python vagy éppen Spark kódrészleteket futtathatunk. Az eszköz kiválóan alkalmas data exploration feladatokra, kísérletezésre.
 
 ## Vezetett rész
 
@@ -44,6 +44,8 @@ A labor során az összes szükséges eszköt Docker konténerként fogjuk futta
 
 A következő parancsokkal indíthatjuk el őket:
 
+**Otthon:**
+
 ```
 docker network create hadooplabor
 ```
@@ -56,6 +58,26 @@ docker run -d -p 8080:8080 --network=hadooplabor --name=hadoop-nifi apache/nifi:
 docker run -d -p 8081:8080 --network=hadooplabor --name=hadoop-zeppelin xemuliam/zeppelin:latest
 
 docker run -d -p 8082:8088 --network=hadooplabor --name=hadoop-superset amancevice/superset:0.22.1
+
+docker exec -it hadoop-superset superset-init
+```
+
+**Egyetemi Labor környezetben:**
+
+Docker beállitásokban felvenni a tanszéki privát Docker Registryt.
+
+```
+docker network create hadooplabor
+```
+
+```
+docker run -d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=hadooplabor --network=hadooplabor --name=hadoop-mysql sydney.aut.bme.hu:5000/mysql:5.7
+
+docker run -d -p 8080:8080 --network=hadooplabor --name=hadoop-nifi sydney.aut.bme.hu:5000/nifi:latest
+
+docker run -d -p 8081:8080 --network=hadooplabor --name=hadoop-zeppelin sydney.aut.bme.hu:5000/zeppelin:latest
+
+docker run -d -p 8082:8088 --network=hadooplabor --name=hadoop-superset sydney.aut.bme.hu:5000/superset:0.22.1
 
 docker exec -it hadoop-superset superset-init
 ```
@@ -193,7 +215,7 @@ A laborvezető segítségével állítsuk össze ezt a Flowt is, majd ellenőriz
 
 #### Zeppelin setup
 
-Hogy a Zeppelin hozzáférhessen az adatbázisunkhoz, fel kell venni a MySQL drivert és az adatbázis beállításokat. Ezekkel egy új JDBC interpretert késítünk.
+Hogy a Zeppelin hozzáférhessen az adatbázisunkhoz, fel kell venni a MySQL drivert és az adatbázis beállításokat. Ezekkel egy új JDBC interpretert készítünk.
 
 [Settings](https://zeppelin.apache.org/docs/0.7.0/interpreter/jdbc.html)
 
@@ -228,7 +250,7 @@ SELECT count(*) as count, genres from movies group by genres order by count desc
 
 #### 3.1 Feladat - Kapcsolódás adatbázishoz
 
-Supersetbe belépve a Sources / Databases felületen a + gombbal uj adatforrást veszünk fel.
+Supersetbe belépve a Sources / Databases felületen a + gombbal új adatforrást veszünk fel.
 
 * Database: hadooplabor
 * SQLAlchemy URI: mysql://root:root@hadoop-mysql:3306/hadooplabor
@@ -246,7 +268,7 @@ Az adatszerkezet leírása a repository `data/README` fájljában található. A
 
 Tippek:
 
-* A 18 éven aluliak kiszűréséhez jól jöhet a RouteOnAttribute processzor
+* A 18 éven aluliak kiszűréséhez jól jöhet a RouteText processzor
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
 
@@ -258,6 +280,6 @@ Keszits tetszoleges elemzeseket az adathalmazon Zeppelin es Superset segitsegeve
 
 * Írj egy lekérdezést, amely kiírja a 10 legtöbb 1-es osztályzattal értékelt film címét, azonosítóját és a rá érkezett 1-es értékelések számát! Vizualizald az eredmenyeket!
 
-* Írj egy lekérdezést, amely kiírja a programozók 3 kedvenc filmjének címét, azonosítóját és a rájuk érkezett 5-ös értékelések számát! (Amelyek a legtöbb 5-ös szavazatot kapták.) Vizualizald az eredmenyeket!
+* Írj egy lekérdezést, amely kiírja a programozók 3 kedvenc filmjének címét, azonosítóját és a rájuk érkezett 5-ös értékelések számát! (Amelyek a legtöbb 5-ös szavazatot kapták.) Vizualizald az eredményeket!
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el kepernyokepeket az elemzesekrol es 1-1 mondatban ird le mit latunk a kepen.
+*Ellenőrzés:* A jegyzőkönyvben helyezz el képernyőképeket az elemzésekről és 1-1 mondatban írd le mit látunk a képen.
