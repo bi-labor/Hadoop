@@ -174,7 +174,7 @@ INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'
 
 *A ${} koze zart kifejezesek a NiFi expression language elemei, jelen formaval FlowFile attributumokat tudunk behelyettesiteni.*
 
-Az elkészült insert statementeket az execute SQL processzorral lefuttathatjuk es ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. Az ExecuteSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
+Az elkészült insert statementeket az put SQL processzorral lefuttathatjuk es ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. Az PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
 
 * connection URL: jdbc:mysql://hadoop-mysql:3306/hadooplabor
 * Driver Class Name: com.mysql.jdbc.Driver
