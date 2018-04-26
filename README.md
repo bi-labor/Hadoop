@@ -77,7 +77,7 @@ docker run -d -p 8080:8080 --network=hadooplabor --name=hadoop-nifi sydney.aut.b
 
 docker run -d -p 8081:8080 --network=hadooplabor --name=hadoop-zeppelin sydney.aut.bme.hu:5000/zeppelin:latest
 
-docker run -d -p 8082:8088 --network=hadooplabor --name=hadoop-superset sydney.aut.bme.hu:5000/superset:0.22.1
+docker run -d -p 8083:8088 --network=hadooplabor --name=hadoop-superset sydney.aut.bme.hu:5000/superset:0.22.1
 
 docker exec -it hadoop-superset superset-init
 ```
@@ -161,11 +161,7 @@ Konfiguráljuk be ezeket úgy, hogy a `GetFile` a `/opt/nifi/movies` mappát fig
 * movieId: `(.*)::.*::.*`
 * title: `[0-9]+::(.*)::.*`
 
-A `ReplaceText` processzor lecserelendo regexe:
-
-```
-(.*)
-```
+A `ReplaceText` processzor Replacement Startegy erteket allisuk Always Replace-re, az evaluation mode ot pedig Entire Text-re.
 
 A replacement value:
 ```
@@ -174,13 +170,14 @@ INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'
 
 *A ${} koze zart kifejezesek a NiFi expression language elemei, jelen formaval FlowFile attributumokat tudunk behelyettesiteni.*
 
-Az elkészült insert statementeket az put SQL processzorral lefuttathatjuk es ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. Az PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
+Az elkészült insert statementeket a PutSQL processzorral lefuttathatjuk es ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. Az PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
 
 * connection URL: jdbc:mysql://hadoop-mysql:3306/hadooplabor
 * Driver Class Name: com.mysql.jdbc.Driver
 * Driver location: /opt/nifi/mysql
 * User: root
 * Password: root
+* Support Fragmented Transactions: false
 
 **Megjegyzés:** Az SQL insertnél lesznek hibák, mert nem escapeltük az aposztróf és idézőjel karaktereket. Ez most nem gond. ReplaceText-el egyszerűen megoldható.
 
@@ -246,7 +243,7 @@ SELECT count(*) as count, genres from movies group by genres order by count desc
 
 ### 3. Feladat - Superset dashboardok
 
-[Superset UI](http://localhost:8082/login/)
+[Superset UI](http://localhost:8083/login/)
 
 #### 3.1 Feladat - Kapcsolódás adatbázishoz
 
