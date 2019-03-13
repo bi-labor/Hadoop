@@ -47,19 +47,9 @@ A következő parancsokkal indíthatjuk el őket:
 **Otthon:**
 
 ```
-docker network create hadooplabor
-```
+docker-compose -p bilabor up -d
 
-```
-docker run -d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=hadooplabor --network=hadooplabor --name=hadoop-mysql mysql:5.7
-
-docker run -d -p 8080:8080 --network=hadooplabor --name=hadoop-nifi apache/nifi:latest
-
-docker run -d -p 8081:8080 --network=hadooplabor --name=hadoop-zeppelin xemuliam/zeppelin:latest
-
-docker run -d -p 8082:8088 --network=hadooplabor --name=hadoop-superset amancevice/superset:0.22.1
-
-docker exec -it hadoop-superset superset-init
+docker exec -it bilabor_superset_1 superset-init
 ```
 
 **Egyetemi Labor környezetben:**
@@ -67,19 +57,9 @@ docker exec -it hadoop-superset superset-init
 Docker beállitásokban felvenni a tanszéki privát Docker Registryt.
 
 ```
-docker network create hadooplabor
-```
+docker-compose -p bilabor up -d
 
-```
-docker run -d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=hadooplabor --network=hadooplabor --name=hadoop-mysql sydney.aut.bme.hu:5000/mysql:5.7
-
-docker run -d -p 8080:8080 --network=hadooplabor --name=hadoop-nifi sydney.aut.bme.hu:5000/nifi:latest
-
-docker run -d -p 8081:8080 --network=hadooplabor --name=hadoop-zeppelin sydney.aut.bme.hu:5000/zeppelin:latest
-
-docker run -d -p 8083:8088 --network=hadooplabor --name=hadoop-superset sydney.aut.bme.hu:5000/superset:0.22.1
-
-docker exec -it hadoop-superset superset-init
+docker exec -it bilabor_superset_1 superset-init
 ```
 
 ### 1. Feladat - adatbetöltés Apache NiFivel
@@ -92,7 +72,7 @@ A labor során ezekkel az adathalmazokkal fogunk dolgozni.
 Az adatfileokat le kell töltenunk a NiFi konténerébe, ehhez tegyük a következőt:
 
 ```
-docker exec -it hadoop-nifi bash
+docker exec -it bilabor_nifi_1 bash
 
 cd ..
 
@@ -138,7 +118,7 @@ Apache NiFi használatával töltsük be a fájl tartalmát MySQL-be, a `movies`
 Első lépésként létre kell hoznunk a megfelelő adatbázistáblákat:
 
 ```
-docker exec -it hadoop-mysql bash
+docker exec -it bilabor_db_1 bash
 
 mysql -uroot -proot
 
@@ -172,7 +152,7 @@ INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'
 
 Az elkészült insert statementeket a PutSQL processzorral lefuttathatjuk es ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. Az PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
 
-* connection URL: jdbc:mysql://hadoop-mysql:3306/hadooplabor
+* connection URL: jdbc:mysql://db:3306/hadooplabor
 * Driver Class Name: com.mysql.jdbc.Driver
 * Driver location: /opt/nifi/mysql
 * User: root
@@ -219,7 +199,7 @@ Hogy a Zeppelin hozzáférhessen az adatbázisunkhoz, fel kell venni a MySQL dri
 * default.driver: com.mysql.jdbc.Driver
 * default.password: root
 * default.user: root
-* default.url: jdbc:mysql://hadoop-mysql:3306/hadooplabor
+* default.url: jdbc:mysql://db:3306/hadooplabor
 * artifact: mysql:mysql-connector-java:jar:5.1.45
 
 #### Néhány egyszerű lekérdezés
@@ -250,7 +230,7 @@ SELECT count(*) as count, genres from movies group by genres order by count desc
 Supersetbe belépve a Sources / Databases felületen a + gombbal új adatforrást veszünk fel.
 
 * Database: hadooplabor
-* SQLAlchemy URI: mysql://root:root@hadoop-mysql:3306/hadooplabor
+* SQLAlchemy URI: mysql://root:root@db:3306/hadooplabor
 * Expose in SQL Lab: true
 
 Készítsük el ugyanazokat a kimutatásokat mint Zeppelinben!
