@@ -1,0 +1,20 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hadooplabor
+  superset:
+    image: amancevice/superset:0.28.1
+    ports:
+      - "16000:8088"
+  zeppelin:
+    image: xemuliam/zeppelin:0.8
+    ports:
+      - "16001:8080"
+  nifi:
+    image: apache/nifi:1.8.0
+    ports:
+      - "16002:8080"
