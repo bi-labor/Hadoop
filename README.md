@@ -64,7 +64,7 @@ docker exec -it bilabor_superset_1 superset-init
 
 ### 1. Feladat - adatbetöltés Apache NiFivel
 
-[NiFi UI](http://localhost:8080/nifi/)
+[NiFi UI](http://localhost:16002/nifi/)
 
 A repository `data` mappájában megtalálhatunk három adathalmazt, amelyet a [http://movielens.org](http://movielens.org) oldalon található filmadatbázisból, és a hozzá tartozó értékelésekből nyertek ki.
 A labor során ezekkel az adathalmazokkal fogunk dolgozni.
@@ -188,7 +188,7 @@ A laborvezető segítségével állítsuk össze ezt a Flowt is, majd ellenőriz
 
 ### 2. Feladat - Zeppelin data exploration
 
-[Zeppelin UI](http://localhost:8081/#/)
+[Zeppelin UI](http://localhost:16001/#/)
 
 #### Zeppelin setup
 
@@ -223,7 +223,7 @@ SELECT count(*) as count, genres from movies group by genres order by count desc
 
 ### 3. Feladat - Superset dashboardok
 
-[Superset UI](http://localhost:8083/login/)
+[Superset UI](http://localhost:16000/login/)
 
 #### 3.1 Feladat - Kapcsolódás adatbázishoz
 
