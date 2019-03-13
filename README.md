@@ -57,7 +57,7 @@ docker exec -it bilabor_superset_1 superset-init
 Docker beállitásokban felvenni a tanszéki privát Docker Registryt.
 
 ```
-docker-compose -p bilabor up -d
+docker-compose -p bilabor -f docker-compose-aut.yml up -d
 
 docker exec -it bilabor_superset_1 superset-init
 ```
