@@ -7,7 +7,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hadooplabor
   superset:
-    image: amancevice/superset:0.28.1
+    image: amancevice/superset:0.35.2
     ports:
       - "16000:8088"
   zeppelin:
@@ -15,6 +15,6 @@ services:
     ports:
       - "16001:8080"
   nifi:
-    image: apache/nifi:1.8.0
+    image: apache/nifi:1.11.4
     ports:
       - "16002:8080"
