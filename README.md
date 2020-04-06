@@ -61,6 +61,8 @@ docker-compose -p bilabor up -d
 docker exec -it bilabor_superset_1 superset-init
 ```
 
+A második parancs során fog a Superset inicializálódni, többek közt itt adható meg az admin felhasználó neve és jelszava, amivel később a felületen be tudunk lépni.
+
 **Egyetemi Labor környezetben:**
 
 Docker beállitásokban felvenni a tanszéki privát Docker Registryt. A egyetemi környezethez szükséges leíró a docker-compose-aut.yml.
@@ -70,6 +72,8 @@ docker-compose -p bilabor -f docker-compose-aut.yml up -d
 
 docker exec -it bilabor_superset_1 superset-init
 ```
+
+A második parancs során fog a Superset inicializálódni, többek közt itt adható meg az admin felhasználó neve és jelszava, amivel később a felületen be tudunk lépni.
 
 ### 1. Feladat - adatbetöltés Apache NiFivel
 
@@ -236,13 +240,21 @@ A laborvezető segítségével állítsuk össze ezt a Flowt is, majd ellenőriz
 
 #### Zeppelin setup
 
-Hogy a Zeppelin hozzáférhessen az adatbázisunkhoz, fel kell venni a MySQL drivert és az adatbázis beállításokat. Ezekkel egy új JDBC interpretert készítünk.
+Hogy a Zeppelin hozzáférhessen az adatbázisunkhoz, fel kell venni a MySQL drivert és az adatbázis beállításokat. Ezekkel egy új JDBC interpretert készítünk, de előbb hozzá kell adnunk egy unsecure maven repositoryt is a Zeppelinhez.
 
 [Settings](https://zeppelin.apache.org/docs/0.8.0/interpreter/jdbc.html)
 
 Válasszuk jobb felül az anonymus ra kattintva az Interpreter opciót.
 
 ![Interpreters](screens/zeppelin/interpreters.png)
+
+Először a maven repót adjuk hozzá, ehhez jobb felül válasszuk a repositories, majd a megjelenő lista mellett a + gombot. A formot töltsük ki a képen láthatók szerint és mentsük el. A használt mvn repository url.
+
+```sh
+http://insecure.repo1.maven.org/maven2/
+```
+
+![Interpreters](screens/zeppelin/maven.png)
 
 Majd jobb felül a create gombot nyomjuk meg és vegyünk fel egy új jdbc típusú interpretert az alábbi adatokkal.
 
