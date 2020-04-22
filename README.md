@@ -230,7 +230,9 @@ Ezen kívül hozzunk létre egy másik Process Groupot is, az aktuális feladat 
 
 Itt is hasonló megoldást fogunk követni, mint az előzőekben.
 
-A laborvezető segítségével állítsuk össze ezt a Flowt is, majd ellenőrizzük le a kapott eredményt!
+> Figyelem! A Ratings adatfajlban az elvalaszto karakter nem :: hanem !
+
+Állítsuk össze ezt a Flowt is, majd ellenőrizzük le a kapott eredményt!
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
 
@@ -319,7 +321,7 @@ Készítsük el ugyanazokat a kimutatásokat, mint Zeppelinben!
 
 Töltsd be a `users` adatállományt is a MySQL adatbázisba!
 A betöltés során szűrd ki a 18 év alatti felhasználókat.
-Az adatszerkezet leírása a repository `data/README` fájljában található. A szeparator karekter: ,
+Az adatszerkezet leírása a repository `data/README` fájljában található. **FIGYELEM! A szeparator karekter: ,**
 
 Tippek:
 
