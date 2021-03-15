@@ -18,7 +18,7 @@ Felhasználási területei igen széleskörűek, mi egyfajta ETL eszközként fo
 
 ### Superset - [Superset](https://superset.incubator.apache.org/)
 
-A Superset egy web alapú dashboard készítő eszköz, ami SQL adatforrásokat tud használni. Segítségével grafikus módon, akár jelentősebb SQL tudás nélkül is látványos kimutatásokat készíthetünk. Fejlesztését az Airbnb nél kezdték. Főbb entitások a rendszerben:
+A Superset egy web alapú dashboard készítő eszköz, ami SQL adatforrásokat tud használni. Segítségével grafikus módon, akár jelentősebb SQL tudás nélkül is látványos kimutatásokat készíthetünk. Fejlesztését az Airbnb-nél kezdték. Főbb entitások a rendszerben:
 
 * Dashboard - Sliceokból álló felület, Sliceok (grafikonok) csoportosítása
 * Chart - Alap egység, grafikon
@@ -35,12 +35,15 @@ Az Apache Zeppelin egy web alapú notebook eszköz. Könnyen bővíthető archit
 
 ### 0. Feladat - környezet előkészítése
 
-A labor során az összes szükséges eszköt Docker konténerként fogjuk futtatni Docker Compose segítségével, így ezeknek elérhetőnek kell lenniük a környezetünkben. 
+A labor során az összes szükséges eszközt Docker konténerként fogjuk futtatni Docker Compose segítségével, így ezeknek elérhetőnek kell lenniük a környezetünkben. 
 
-A Docker egy konténer alapú, kis overheadű virtualizációs technológia. Segítségével Dockler Imagekből Docker Container eket tudunk indítani, mely egy egy szolgáltatás, szoftvert tartalmaznak. Néhány alapvető paranccsal termnálból menedzselhetjük ezeket.
+Töltsük le és telepítsük a [Docker Desktop](https://www.docker.com/products/docker-desktop) alkalmazást.
+
+A Docker egy konténer alapú, kis overheadű virtualizációs technológia. Segítségével Docker Image-kből Docker konténereket tudunk indítani, mely egy-egy szolgáltatást, szoftvert tartalmaznak. Néhány alapvető paranccsal termnálból menedzselhetjük ezeket.
 
 * ```docker ps``` - futó konténerek listázása
-* ```docker exec -it <konténer név> bash``` - terminált nyit az adott konténerbe. [További hasznos parancsok.](https://devhints.io/docker)
+* ```docker exec -it <konténer név> bash``` - terminált nyit az adott konténerbe. 
+* [További hasznos parancsok.](https://devhints.io/docker)
 
 A következő konténerekre lesz szükség a labor során:
 
@@ -51,9 +54,7 @@ A következő konténerekre lesz szükség a labor során:
 
 A következő parancsokkal indíthatjuk el őket:
 
-**Otthon:**
-
-Otthoni környezetben a docker-compose.yml használandó.
+Otthoni környezetben a docker-compose.yml használandó. Töltsük le és mappájában a következő parancsokkal indíthatjuk el Docker konténert:
 
 ```sh
 docker-compose -p bilabor up -d
@@ -61,28 +62,28 @@ docker-compose -p bilabor up -d
 docker exec -it bilabor_superset_1 superset-init
 ```
 
-A második parancs során fog a Superset inicializálódni, többek közt itt adható meg az admin felhasználó neve és jelszava, amivel később a felületen be tudunk lépni.
+Első indításkor az első parancs letölti az szükséges image-ket, majd a docker-compose.yml fájl alapján inicializálja és elindítja a négy szolgáltatást. [További részletek](https://docs.docker.com/compose/compose-file/compose-file-v3/)
 
-**Egyetemi Labor környezetben:**
+Látható, hogy a MySQL default `3306` valamint a Superset, Zeppelin és NiFi default `8088`, illetve `8080` portjai vannak összekapcsolva a saját gépünkön az `13306`, illetve `16000`, `16001` és `16002` portokkal. 
+(Esetleges lokális példányokkal és korábbi Docker előzményekkel való portütközések elkerülése végett.
+További ütközés esetén a docker-compose-yml fájlban kell az `X:Y` sorokat átírni `X` helyére a kívánt portra és ismét elindítani a konténert. 
+Ezesetben a böngészőben az új portokon kell megnyitni a Superset, Zeppelin és NiFi felületeit. Továbbá a MySQL port beírása során is az új portot kell használni.)
 
-Docker beállitásokban felvenni a tanszéki privát Docker Registryt. A egyetemi környezethez szükséges leíró a docker-compose-aut.yml.
-
-```sh
-docker-compose -p bilabor -f docker-compose-aut.yml up -d
-
-docker exec -it bilabor_superset_1 superset-init
-```
+A MySQL konténeren beállításra kerül az adatbázis és a root felhasználó jelszava. 
 
 A második parancs során fog a Superset inicializálódni, többek közt itt adható meg az admin felhasználó neve és jelszava, amivel később a felületen be tudunk lépni.
+
+**Figyelem! A jegyzőkönyvbe beillesztett képernyőképeken minden esetben látszódjon a dátum és idő (pl. a tálcán), illetve a Név-Neptun kód páros (pl. Jegyzettömbben).**
 
 ### 1. Feladat - adatbetöltés Apache NiFivel
 
 [NiFi UI](http://localhost:16002/nifi/)
 
 A repository `data` mappájában megtalálhatunk három adathalmazt, amelyet a [http://movielens.org](http://movielens.org) oldalon található filmadatbázisból, és a hozzá tartozó értékelésekből nyertek ki.
-A labor során ezekkel az adathalmazokkal fogunk dolgozni.
+A labor során ezekkel az adathalmazokkal fogunk dolgozni. 
+Ismerkedjünk meg az adathalmazokkal, felépítésükkel, ID-kkal és szeparátor karakterekkel. [MovieLens Summary](https://github.com/bi-labor/Hadoop/blob/master/data/README)
 
-Az adatfileokat le kell töltenünk a NiFi konténerébe, ehhez tegyük a következőt:
+Az adatfileokat le kell töltenünk a NiFi konténerébe, ehhez soronként futtassuk a következő parancsokat:
 
 ```sh
 docker exec -it bilabor_nifi_1 bash
@@ -173,11 +174,11 @@ A replacement value:
 INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'}','${'genres'}');
 ```
 
-*A ${} koze zart kifejezesek a NiFi expression language elemei, jelen formaval FlowFile attributumokat tudunk behelyettesiteni.*
+*A ${} közé zárt kifejezések a NiFi expression language elemei, jelen formával FlowFile attribútumokat tudunk behelyettesíteni.*
 
 Az elkészült INSERT statementeket a PutSQL processzorral lefuttathatjuk és ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. A PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
 
-* **connection URL**: jdbc:mysql://db:3306/hadooplabor
+* **connection URL**: jdbc:mysql://db:13306/hadooplabor
 * **Driver Class Name**: com.mysql.jdbc.Driver
 * **Driver location**: /opt/nifi/mysql
 * **User**: root
@@ -191,23 +192,23 @@ A beállításhoz a processor Properties tabján adjunk hozzá új adatbázis sz
 Ezt követően az új service mellett kattintsunk a jobbra mutató nyilacskára.
 ![Flow](screens/nifi/db-setup-2.png)
 
-A kilistázott 1 db controller servicenél válasszuka  fogskerék ikonnal a beállításokat, majd adjuk meg a szükséges adatokat.
+A kilistázott 1 db controller servicenél válasszuk a fogaskerék ikonnal a beállításokat, majd adjuk meg a szükséges adatokat.
 ![Flow](screens/nifi/db-setup-3.png)
 
 Végül a villám ikonnal aktiváljuk az adatbázis kapcsolatot.
 ![Flow](screens/nifi/db-setup-4.png)
 
-Ezt követően már cdak össze kell kössük a processorainkat, létrehozva a Connectionoket. Ezt az egérrel tudjuk megtenni. Egy processzor fölé víve az egeret megjelenik egy nyilacskás ikon, azt kell a cél processzorra húzni. A felugró ablakban ki kell választani, hogy a processzor mely kimenetét szeretnénk bekötni. Nagyon fontos, hogy a nem használt kimeneteket a processzor beállítások nézet első tabján auto terminate re kell jelölni, vagy a processzor nem fog elindulni. Ha bekötetlen és auto terminálatlan kimenetünk van azt a processzoron megjelenő sárga háromszög is jelzi.
+Ezt követően már csak össze kell kössük a processorainkat, létrehozva a Connectionoket. Ezt az egérrel tudjuk megtenni. Egy processzor fölé víve az egeret megjelenik egy nyilacskás ikon, azt kell a cél processzorra húzni. A felugró ablakban ki kell választani, hogy a processzor mely kimenetét szeretnénk bekötni. Nagyon fontos, hogy a nem használt kimeneteket a processzor beállítások nézet első tabján auto terminate-re kell jelölni, vagy a processzor nem fog elindulni. Ha bekötetlen és auto terminálatlan kimenetünk van azt a processzoron megjelenő sárga háromszög is jelzi.
 
 Autoterminate kimenetek: ![Flow](screens/nifi/splittext-autoterminate.png)
 
-A kiválasztott kimenet neve a kapcsolaton megjelenő kis dobozon leolvasható, ez látszik az alábbi ábrán is, ez alapján kell beállítani a flowt. Az elkészült teljes flow: ![Flow](screens/nifi/flow.png)
+A kiválasztott kimenet neve a kapcsolaton megjelenő kis dobozon leolvasható, ez látszik az alábbi ábrán is, ez alapján kell beállítani a flow-t. Az elkészült teljes flow: ![Flow](screens/nifi/flow.png)
 
-Ha mindennel megvagyunk elindíthatjuk a processzorokat. Ezt megtehetjük egyesével vagy vagy mind egyszerre. A processzoron történő jobbklikkes menüben van lehetőség a processzorok indítására és leállítására, vagy a canvas bal oldal a kijelölt processzorok egyszerre is indíthatók.
+Ha mindennel megvagyunk elindíthatjuk a processzorokat. Ezt megtehetjük egyesével vagy mind egyszerre. A processzoron történő jobbklikkes menüben van lehetőség a processzorok indítására és leállítására, vagy a canvas bal oldal a kijelölt processzorok egyszerre is indíthatók.
 
 **Megjegyzés:** Az SQL insertnél lesznek hibák, mert nem escapeltük az aposztróf és idézőjel karaktereket. Ez most nem gond. ReplaceText-el egyszerűen megoldható.
 
-A flown végigkövethetjük, hoy mi történik a fájlunkkal. Minden processzor kiírja a felületen, hogy hány rekord érkezett be és ment tovább. Ezt leglátványosabban a splittextnél láthatjuk ahol 1 FlowFile megy be és 3884 jön ki. Ha megnézzük a movies.dat fájlt annak pont ennyi sora volt, így biztosan tudhatjuk, hogy a SplitText jól működött.
+A flow-n végigkövethetjük, hogy mi történik a fájlunkkal. Minden processzor kiírja a felületen, hogy hány rekord érkezett be és ment tovább. Ezt leglátványosabban a splittextnél láthatjuk ahol 1 FlowFile megy be és 3884 jön ki. Ha megnézzük a movies.dat fájlt annak pont ennyi sora volt, így biztosan tudhatjuk, hogy a SplitText jól működött.
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok (3426 sornak kell lennie).
 
@@ -232,7 +233,7 @@ Itt is hasonló megoldást fogunk követni, mint az előzőekben.
 
 > Figyelem! A Ratings adatfajlban az elvalaszto karakter nem :: hanem !
 
-Állítsuk össze ezt a Flowt is, majd ellenőrizzük le a kapott eredményt!
+Állítsuk össze ezt a Flow-t is, majd ellenőrizzük le a kapott eredményt!
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
 
@@ -263,7 +264,7 @@ Majd jobb felül a create gombot nyomjuk meg és vegyünk fel egy új jdbc típu
 * **default.driver**: com.mysql.jdbc.Driver
 * **default.password**: root
 * **default.user**: root
-* **default.url**: jdbc:mysql://db:3306/hadooplabor
+* **default.url**: jdbc:mysql://db:13306/hadooplabor
 * **artifact**: mysql:mysql-connector-java:jar:5.1.45
 
 ![Interpreters](screens/zeppelin/new1.png)
@@ -293,7 +294,7 @@ Filmek száma műfajonként:
 SELECT count(*) as count, genres from movies group by genres order by count desc
 ```
 
-*Ellenőrzés:* A lekérdezések eredményeiről helyezz el egy képernyőképet a jegyzőkönyvben!
+*Ellenőrzés:* A lekérdezések eredményeiről helyezz el egy-egy képernyőképet a jegyzőkönyvben!
 
 ### 3. Feladat - Superset dashboardok
 
@@ -304,16 +305,18 @@ SELECT count(*) as count, genres from movies group by genres order by count desc
 Supersetbe belépve a Sources / Databases felületen a + gombbal új adatforrást veszünk fel.
 
 * Database: hadooplabor
-* SQLAlchemy URI: mysql://root:root@db:3306/hadooplabor
+* SQLAlchemy URI: mysql://root:root@db:13306/hadooplabor
 * Expose in SQL Lab: true
 
 ![Interpreters](screens/superset/database.png)
 
 Alul a save gombbal mentsük ezt el. Ha a Superset magától nem fetchelné a táblákat akkor a 3 táblánkat is külön fel kell venni a Sources / tables müben hasonló módon.
 
-Új grafikont a Charts menüre kattintva tudunk felvenni, ahol a varázsló végigvezet minket a lépéseken. FOntos hogy ezen a varázslós felületen csak 1 táblából tudunk dolgozni. Ha joinolni szeretnénk, akkor az SQL Lab ban kell kézzel megírjuk az SQL lekérdezést, majd annak az eredményét egy view hoz hasonlóan tudjuk bevinni a chart szerkesztőbe.
+Új grafikont a Charts menüre kattintva tudunk felvenni, ahol a varázsló végigvezet minket a lépéseken. Fontos, hogy ezen a varázslós felületen csak 1 táblából tudunk dolgozni. Ha joinolni szeretnénk, akkor az SQL Lab-ban kell kézzel megírjuk az SQL lekérdezést, majd annak az eredményét egy view-hoz hasonlóan tudjuk bevinni a chart szerkesztőbe.
 
 Készítsük el ugyanazokat a kimutatásokat, mint Zeppelinben!
+
+*Ellenőrzés:* A lekérdezések eredményeiről helyezz el egy-egy képernyőképet a jegyzőkönyvben!
 
 ## Önálló feladatok
 
@@ -329,9 +332,9 @@ Tippek:
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
 
-### 2. Feladat - Zeppelin, Superset elemzesek
+### 2. Feladat - Zeppelin elemzések
 
-Keszits tetszoleges elemzeseket az adathalmazon Zeppelin es Superset segitsegevel. Osszesen legalabb 4-et, ugyanaz elkeszitve Superetben es Zeppelinben kettonek szamit! Hasznalj kulonbozo grafikon tipusokat. Nehany tipp:
+Készíts tetszőleges elemzéseket az adathalmazon Zeppelin segitségével. Legalább két elemzést készíts el. Használj különböző grafikon típusokat. Néhány tipp:
 
 * Írj egy lekérdezést, amely kiírja a 10 legtöbbet értékelt film címét, azonosítóját és a rá érkezett értékelések számát! Vizualizald az eredmenyeket!
 
@@ -340,3 +343,17 @@ Keszits tetszoleges elemzeseket az adathalmazon Zeppelin es Superset segitsegeve
 * Írj egy lekérdezést, amely kiírja a programozók 3 kedvenc filmjének címét, azonosítóját és a rájuk érkezett 5-ös értékelések számát! (Amelyek a legtöbb 5-ös szavazatot kapták.) Vizualizald az eredményeket!
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el képernyőképeket az elemzésekről és 1-1 mondatban írd le mit látunk a képen.
+
+### 3. Feladat - Superset elemzések
+
+Készíts tetszőleges elemzéseket az adathalmazon Superset segitségével. Legalább két elemzést készíts el. Használj különböző grafikon típusokat. Az előző példák is használhatók, sőt az is jó ha ugyanazt a két elemzést megcsinálod, mindkét eszközzel. Vizualizald az eredményeket!
+
+*Ellenőrzés:* A jegyzőkönyvben helyezz el képernyőképeket az elemzésekről és 1-1 mondatban írd le mit látunk a képen.
+
+## Értékelés
+
+A vezetett rész az elégséges határa, a 3 egyéni feladat megoldása mindegyik +1 jegyet jelent, azaz:
+* Vezetett rész + 1 megoldott egyéni = 3
+* Vezetett rész + 2 megoldott egyéni = 4
+* Vezetett rész + összes megoldott egyéni = 5
+
