@@ -1,89 +1,89 @@
 # BI Labor - Hadoop
 
-## Emlékeztető
+## Reminder
 
 ### Apache NiFi - [NiFi](https://nifi.apache.org)
 
-Az Apache NiFi egy az Apache Software Foundation által karbantartott szoftver, mely segítségével adatfolyamokat menedzselhetünk és automatizálhatunk.
-A projekt igen népszerű, többek között azon oknál fogva, hogy számos adatforrással és célponttal tud dolgozni, valamint kiterjedt lehetőségeket biztosít az adatok feldolgozására is.
-Felhasználási területei igen széleskörűek, mi egyfajta ETL eszközként fogunk rá tekinteni, amely segít az adatok különböző forrásokból történő betöltésében, előfeldolgozásában.
+Apache NiFi is software maintained by the Apache Software Foundation that allows you to manage and automate data streams.
+The project is very popular, among other reasons, because it can work with many data sources and destinations, as well as provides extensive opportunities for data processing.
+Its fields of application are very wide, we will consider it as a kind of ETL tool that helps to load and pre-process data from different sources.
 
-#### Fontos fogalmak
+#### Important terms
 
-1. *FlowFile:* Egy FlowFile lényegében egy csomagként fogható fel, amely a rendszerben halad az egyes adatfolyamok mentén. Minden FlowFile két elemből áll össze, a metaadatokat tartalmazó attribútumokból, és a FlowFilehoz tartozó adat tartalmából.
-2. *FlowFile Processor:* A lényegi munkát a Processorok végzik el. Feladatuk lehet az adat transzformálása, routeolása, vagy betöltése valamilyen külső rendszerbe. A Processorok hozzáférnek a FlowFileok attribútumaihoz, és tartalmához is. A NiFi adatfolyam gráfjaiban ezek a csomópontok.
-3. *Connection:* Az egyes Processorokat valamilyen módon össze kell kötni, ebben segítenek a Connectionök. Annak érdekében, hogy a különböző sebességgel működő Processorok összeköthetők legyenek, a köztük lévő kapcsolatok egyfajta várakozási sorként is működnek, melyek paraméterei konfigurálhatók.
-4. *Flow Controller:* Ütemezőként működik, amely az egyes Processorok számára fenntartott szálakat és erőforrásokat kezeli.
-5. *Process Group:* Feldolgozási egység, amely tartalmazhat Processorokat és Connectionöket. Fogadhat, illetve küldhet adatot az Input és Output portjain keresztül. Tipikusan a különböző absztrakciós szinten mozgó feldolgozási elemek egységbe foglalására használjuk.
+1. *FlowFile:* A FlowFile can essentially be thought of as a packet that travels along each stream in the system. Each FlowFile consists of two elements, the attributes that contain the metadata and the content of the data that belongs to the FlowFile.
+2. *FlowFile Processor:* The essential work is done by the Processors. Their task may be to transform, route, or load the data into an external system. Processors also have access to the attributes and contents of FlowFiles. In the graphs of the NiFi stream, these are the nodes.
+3. *Connection:* Each Processor must be connected in some way, the Connections help. In order to be able to connect Processors operating at different speeds, the connections between them also act as a kind of queue, the parameters of which can be configured.
+4. *Flow Controller:* Acts as a scheduler that manages the threads and resources reserved for each Processor.
+5. *Process Group:* A processing unit that can contain Processors and Connections. You can receive or send data through the Input and Output ports. It is typically used to integrate processing elements moving at different levels of abstraction.
 
 ### Superset - [Superset](https://superset.incubator.apache.org/)
 
-A Superset egy web alapú dashboard készítő eszköz, ami SQL adatforrásokat tud használni. Segítségével grafikus módon, akár jelentősebb SQL tudás nélkül is látványos kimutatásokat készíthetünk. Fejlesztését az Airbnb-nél kezdték. Főbb entitások a rendszerben:
+Superset is a web-based dashboard builder that can use SQL data sources. With its help, we can create spectacular statements in a graphical way, even without significant SQL knowledge. Its development began at Airbnb. Main entities in the system:
 
-* Dashboard - Sliceokból álló felület, Sliceok (grafikonok) csoportosítása
-* Chart - Alap egység, grafikon
-* Table - Adatbázis tábla
-* Database - Adatbázis
+* Dashboard - Slice interface, grouping of slices
+* Chart - Basic unit, chart
+* Table - Database table
+* Database
 
-Az alkalmazásban a forrás adatbázis és annak táblái felvételét követően chartokat definiálunk. A chartokat dashboardokhoz rendelve különbőző felületeket készíthetünk. Az eszköz remekül használható olyan dashboardok keszítésére melyet nem IT-s ügyfeleknek szolgaltatnak adatokat. Az elkészített felületek könnyen egyedi weboldalakba is ágyazhatók.
+In the application, charts are defined after the source database and its tables have been added. By assigning charts to dashboards, we can create different surfaces. The tool is great for creating dashboards that provide data to non-IT customers. The created interfaces can be easily embedded in individual web pages.
 
 ### Zeppelin - [Zeppelin](https://zeppelin.apache.org/)
 
-Az Apache Zeppelin egy web alapú notebook eszköz. Könnyen bővíthető architektúrájának köszönhetően számos interpreter érhető el hozzá melyekkel SQL lekérdezéseket, Python vagy éppen Spark kódrészleteket futtathatunk. Az eszköz kiválóan alkalmas data exploration feladatokra, kísérletezésre.
+Apache Zeppelin is a web-based notebook tool. Thanks to its easy-to-expand architecture, there are many interpreters available to run SQL queries, Python or even Spark code snippets. The tool is excellent for data exploration tasks and experimentation.
 
-## Vezetett rész
+## Common part
 
-### 0. Feladat - környezet előkészítése
+### Task 0. - initializing the environment
 
-A labor során az összes szükséges eszközt Docker konténerként fogjuk futtatni Docker Compose segítségével, így ezeknek elérhetőnek kell lenniük a környezetünkben. 
+During the lab, all the services will be run as Docker containers using Docker Compose, so they should be available in our environment.
 
-Töltsük le és telepítsük a [Docker Desktop](https://www.docker.com/products/docker-desktop) alkalmazást.
+Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop).
 
-A Docker egy konténer alapú, kis overheadű virtualizációs technológia. Segítségével Docker Image-kből Docker konténereket tudunk indítani, mely egy-egy szolgáltatást, szoftvert tartalmaznak. Néhány alapvető paranccsal termnálból menedzselhetjük ezeket.
+Docker is a container-based, small overhead virtualization technology. 
+With its help, we can launch Docker containers from Docker Images, which contain a service or software. 
+With a few basic commands, you can manage these from the terminal.
 
-* ```docker ps``` - futó konténerek listázása
-* ```docker exec -it <konténer név> bash``` - terminált nyit az adott konténerbe. 
-* [További hasznos parancsok.](https://devhints.io/docker)
+* ```docker ps``` - list of running containers
+* ```docker exec -it <container name> bash``` - opens a terminal in the given container.
+* [More useful commands.](Https://devhints.io/docker)
 
-A következő konténerekre lesz szükség a labor során:
+We will use the following containers:
 
 * MySQL
 * NiFi
 * Superset
 * Zeppelin
 
-A következő parancsokkal indíthatjuk el őket:
-
-Otthoni környezetben a docker-compose.yml használandó. Töltsük le és mappájában a következő parancsokkal indíthatjuk el Docker konténert:
-
+During the distance learning, use the docker-compose.yml file. Download this file and in its folder, you can start the Docker container with the following commands:
 ```sh
 docker-compose -p bilabor up -d
 
 docker exec -it bilabor_superset_1 superset-init
 ```
 
-Első indításkor az első parancs letölti az szükséges image-ket, majd a docker-compose.yml fájl alapján inicializálja és elindítja a négy szolgáltatást. [További részletek](https://docs.docker.com/compose/compose-file/compose-file-v3/)
+At first startup, the first command downloads the required images and then initializes and starts the four services based on the `docker-compose.yml` file. [More details](https://docs.docker.com/compose/compose-file/compose-file-v3/)
 
-Látható, hogy a MySQL default `3306` valamint a Superset, Zeppelin és NiFi default `8088`, illetve `8080` portjai vannak összekapcsolva a saját gépünkön az `13306`, illetve `16000`, `16001` és `16002` portokkal. 
-(Esetleges lokális példányokkal és korábbi Docker előzményekkel való portütközések elkerülése végett.
-További ütközés esetén a docker-compose-yml fájlban kell az `X:Y` sorokat átírni `X` helyére a kívánt portra és ismét elindítani a konténert. 
-Ezesetben a böngészőben az új portokon kell megnyitni a Superset, Zeppelin és NiFi felületeit. Továbbá a MySQL port beírása során is az új portot kell használni.)
+You can see that the ports of MySQL default `3306` also the Superset, Zeppelin and NiFi default `8088` and `8080` ports are connected to the `13306`, `16000`, `16001` and `16002` ports on our own machine.
+(To avoid port collisions with possible local instances and previous Docker history.
+In the event of a collision, the lines `X:Y` in the `docker-compose.yml` file have to be rewritten to the desired port `X` and the container should be restarted.
+In this case, the new port numbers should be used in the browser when opening the UI of the Superset, Zeppelin and NiFi. Furthermore when setting the MySQL port during the lab, the new port have to be used.)
 
-A MySQL konténeren beállításra kerül az adatbázis és a root felhasználó jelszava. 
+The root user password is set on MySQL and the database also. 
 
-A második parancs során fog a Superset inicializálódni, többek közt itt adható meg az admin felhasználó neve és jelszava, amivel később a felületen be tudunk lépni.
+The second command will initialized the Superset, including the admin username and password, which we will use to login to the UI, later.
 
-**Figyelem! A jegyzőkönyvbe beillesztett képernyőképeken minden esetben látszódjon a dátum és idő (pl. a tálcán), illetve a Név-Neptun kód páros (pl. Jegyzettömbben).**
+**Attention! In each task, the inserted screenshots in the report should show the date and time (eg. on the taskbar) and the Name-Neptune code pair (eg. in Notepad).
+**
 
-### 1. Feladat - adatbetöltés Apache NiFivel
+### Task 1. - Data loading with Apache NiFi
 
 [NiFi UI](http://localhost:16002/nifi/)
 
-A repository `data` mappájában megtalálhatunk három adathalmazt, amelyet a [http://movielens.org](http://movielens.org) oldalon található filmadatbázisból, és a hozzá tartozó értékelésekből nyertek ki.
-A labor során ezekkel az adathalmazokkal fogunk dolgozni. 
-Ismerkedjünk meg az adathalmazokkal, felépítésükkel, ID-kkal és szeparátor karakterekkel. [MovieLens Summary](https://github.com/bi-labor/Hadoop/blob/master/data/README)
+In the `data` folder of the repository you can find three datasets extracted from the movie database at [http://movielens.org](http://movielens.org) and the associated ratings.
+We will work with these datasets during the lab.
+Check the datasets, their structure, IDs, and separator characters. [MovieLens Summary](https://github.com/bi-labor/Hadoop/blob/master/data/README)
 
-Az adatfileokat le kell töltenünk a NiFi konténerébe, ehhez soronként futtassuk a következő parancsokat:
+We need to download the data files to the NiFi container by running the following commands line by line:
 
 ```sh
 docker exec -it bilabor_nifi_1 bash
@@ -110,7 +110,7 @@ wget https://raw.githubusercontent.com/bi-labor/Hadoop/master/data/users.dat
 
 ```
 
-MySQL driver letöltése
+Downloading MySQL driver
 
 ```sh
 cd ..
@@ -123,12 +123,12 @@ wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-conn
 exit
 ```
 
-#### 1.1 Feladat - Movies dataset betöltése
+#### Task 1.1 - Loading Movies dataset
 
-Az első betöltendő adathalmaz néhány népszerű film adatait tartalmazza.
-Apache NiFi használatával töltsük be a fájl tartalmát MySQL-be, a `movies` táblába. (szeparator karakter: ::)
+The first dataset contains data from some popular movies.
+Using Apache NiFi, load the contents of the file into MySQL, in the `movies` table. Separator character: ::
 
-Első lépésként létre kell hoznunk a megfelelő adatbázistáblákat:
+The first step is to create the appropriate database table:
 
 ```sh
 docker exec -it bilabor_db_1 bash
@@ -147,16 +147,16 @@ CREATE TABLE movies (
 );
 ```
 
-Az adatbetöltéshez egy egyszerű workflowt fogunk létrehozni NiFi-ben. Az adatok beolvasásárért a `GetFile`, míg az SQL-be írásért a `PutSQL` processzor a felelős. Ezeket a nifi felületén a felső eszköztár balodlali 'Processors' ikonját a canvas-re húzva adhatjuk hozzá. A felugró ablak felsorolja az osszes elérhető processzor típust, ezekből kell a megfelelőt kikeresnünk.
-Konfiguráljuk be ezeket úgy, hogy a `GetFile` a `/opt/nifi/movies` mappát figyelje. A beállítások eléréséhez kattintsunk kétszer egy processzoron, vagy jobbklikk -> configure.
+For data loading, we will create a simple flow in NiFi. The `GetFile` processor is responsible for reading the data, while the `PutSQL` processor is responsible for writing the data. These can be added to the Nifi interface by dragging the 'Processors' icon on the top toolbar to the canvas. The pop-up window lists all available processor types, from which we need to find the right one.
+Configure these so that `GetFile` observes the` / opt / nifi / movies` folder. To access the settings, double-click on a processor or right-click -> configure.
 
 ![Flow](screens/nifi/getfile-settings.png)
 
-A fájl felolvasását követően bontsuk azt sorokra a `SplitText` processzorral.
+After reading the file, split it into lines with the `SplitText` processor.
 
 ![Flow](screens/nifi/splittext-properties.png)
 
-Az egyes sorokat SQL INSERT statementekké kell alakítanunk, ehhez használhatjuk a `ReplaceText` processzort, de előbb a sorban található értékeket FlowFile attribútummá kell alakítanunk az `ExtractText` processzorral. Az ExtractText-nél használt regexek (az új elemeket a Properties tab jobb felső sarkában lévő + gombal adhatjuk hozzá):
+Each line must be converted to SQL INSERT statements, using the `ReplaceText` processor, but first the values in the line must be converted to a FlowFile attribute with the `ExtractText` processor. Regexes used for ExtractText (new items can be added with the + button in the upper right corner of the Properties tab):
 
 * genres: `[0-9]+::.+::(.+)`
 * movieId: `(.*)::.*::.*`
@@ -164,19 +164,19 @@ Az egyes sorokat SQL INSERT statementekké kell alakítanunk, ehhez használhatj
 
 ![Flow](screens/nifi/extracttext-properties.png)
 
-A `ReplaceText` processzor Replacement Startegy értékét állísuk Always Replace-re, az evaluation mode-ot pedig Entire Text-re.
+Set the Replacement Startegy value of the `ReplaceText` processor to Always Replace and the evaluation mode to Entire Text.
 
 ![Flow](screens/nifi/replacetext-properties.png)
 
-A replacement value:
+The replacement value:
 
 ```sql
 INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'}','${'genres'}');
 ```
 
-*A ${} közé zárt kifejezések a NiFi expression language elemei, jelen formával FlowFile attribútumokat tudunk behelyettesíteni.*
+*Expressions enclosed in ${} are elements of the NiFi expression language, with this form we can replace FlowFile attributes.*
 
-Az elkészült INSERT statementeket a PutSQL processzorral lefuttathatjuk és ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. A PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
+The completed INSERT statements can be run with the PutSQL processor and our data records will be saved in the database. The PutSQL processor needs a NiFi server for the DB connection with its settings:
 
 * **connection URL**: jdbc:mysql://db:13306/hadooplabor
 * **Driver Class Name**: com.mysql.jdbc.Driver
@@ -185,36 +185,36 @@ Az elkészült INSERT statementeket a PutSQL processzorral lefuttathatjuk és ez
 * **Password**: root
 * **Support Fragmented Transactions**: false
 
-A beállításhoz a processor Properties tabján adjunk hozzá új adatbázis szervice-t.
+To configure, add a new database service in the processor Properties tab.
 
 ![Flow](screens/nifi/db-setup-1.png)
 
-Ezt követően az új service mellett kattintsunk a jobbra mutató nyilacskára.
+Then click on the right arrow next to the new service.
 ![Flow](screens/nifi/db-setup-2.png)
 
-A kilistázott 1 db controller servicenél válasszuk a fogaskerék ikonnal a beállításokat, majd adjuk meg a szükséges adatokat.
+For the 1 controller service listed, select the settings with the gear icon and enter the required data.
 ![Flow](screens/nifi/db-setup-3.png)
 
-Végül a villám ikonnal aktiváljuk az adatbázis kapcsolatot.
+Finally, we activate the database connection with the lightning icon.
 ![Flow](screens/nifi/db-setup-4.png)
 
-Ezt követően már csak össze kell kössük a processorainkat, létrehozva a Connectionoket. Ezt az egérrel tudjuk megtenni. Egy processzor fölé víve az egeret megjelenik egy nyilacskás ikon, azt kell a cél processzorra húzni. A felugró ablakban ki kell választani, hogy a processzor mely kimenetét szeretnénk bekötni. Nagyon fontos, hogy a nem használt kimeneteket a processzor beállítások nézet első tabján auto terminate-re kell jelölni, vagy a processzor nem fog elindulni. Ha bekötetlen és auto terminálatlan kimenetünk van azt a processzoron megjelenő sárga háromszög is jelzi.
+After that, all we have to do is connect our processors, creating the Connections. We can do this with the mouse. Hovering the mouse over a processor will display an arrow icon, it must be dragged to the target processor. In the pop-up window, select which output of the processor you want to connect. It is very important that unused outputs be marked autoterminate, in the first tab of the processor settings view, or the processor will not start. If you have unconnected and non autoterminated output, this is also indicated by a yellow triangle on the processor.
 
-Autoterminate kimenetek: ![Flow](screens/nifi/splittext-autoterminate.png)
+Autoterminate outputs: ![Flow](screens/nifi/splittext-autoterminate.png)
 
-A kiválasztott kimenet neve a kapcsolaton megjelenő kis dobozon leolvasható, ez látszik az alábbi ábrán is, ez alapján kell beállítani a flow-t. Az elkészült teljes flow: ![Flow](screens/nifi/flow.png)
+The name of the selected output can be read on the small box that appears on the connection, this is also shown in the figure below, based on this the flow must be set. Completed total flow:  ![Flow](screens/nifi/flow.png)
 
-Ha mindennel megvagyunk elindíthatjuk a processzorokat. Ezt megtehetjük egyesével vagy mind egyszerre. A processzoron történő jobbklikkes menüben van lehetőség a processzorok indítására és leállítására, vagy a canvas bal oldal a kijelölt processzorok egyszerre is indíthatók.
+When we're done, we can start the processors. We can do this one by one or all at once. You can start and stop the processors in the right-click menu on the processor, or the selected processors can be started at the same time on the left side of the canvas.
 
-**Megjegyzés:** Az SQL insertnél lesznek hibák, mert nem escapeltük az aposztróf és idézőjel karaktereket. Ez most nem gond. ReplaceText-el egyszerűen megoldható.
+**Note:** There will be errors with the SQL insert because we did not escape the apostrophe and quotation mark characters. This is not a problem now. Can be easily solved with ReplaceText.
 
-A flow-n végigkövethetjük, hogy mi történik a fájlunkkal. Minden processzor kiírja a felületen, hogy hány rekord érkezett be és ment tovább. Ezt leglátványosabban a splittextnél láthatjuk ahol 1 FlowFile megy be és 3884 jön ki. Ha megnézzük a movies.dat fájlt annak pont ennyi sora volt, így biztosan tudhatjuk, hogy a SplitText jól működött.
+Through the flow, we can track what happens to our file. Each processor prints to the interface how many records were received and passed on. This is most spectacular in splittext where 1 FlowFile goes in and 3884 comes out. If we look at the movies.dat file, it had just that many lines, so we can be sure that SplitText worked well.
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok (3426 sornak kell lennie).
+*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared (3426 lines).
 
-#### 1.2 Feladat - Ratings dataset betöltése
+#### Task 1.2 - Loading Ratings dataset
 
-A szükséges SQL adattábla:
+The necessary SQL data table:
 
 ```sql
 CREATE TABLE ratings (
@@ -226,32 +226,32 @@ CREATE TABLE ratings (
 );
 ```
 
-Annak érdekében, hogy átláthatóbb legyen a NiFi Flow konfigurációnk, hozzunk létre egy új Process Groupot, ahova bemásoljuk az eddigi Processorokat.
-Ezen kívül hozzunk létre egy másik Process Groupot is, az aktuális feladat számára.
+In order to make our NiFi Flow configuration more transparent, let’s create a new Process Group where we copy the existing Processors.
+In addition, create another Process Group for the current task.
 
-Itt is hasonló megoldást fogunk követni, mint az előzőekben.
+Here, too, we will follow a similar solution as the previous ones.
 
-> Figyelem! A Ratings adatfajlban az elvalaszto karakter nem :: hanem !
+> Attention! In the Ratings data file, the separator character is not :: but !
 
-Állítsuk össze ezt a Flow-t is, majd ellenőrizzük le a kapott eredményt!
+Assemble this Flow as well, then check the result obtained!
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
+*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared.
 
-### 2. Feladat - Zeppelin data exploration
+### Task 2. - Zeppelin data exploration
 
 [Zeppelin UI](http://localhost:16001/#/)
 
 #### Zeppelin setup
 
-Hogy a Zeppelin hozzáférhessen az adatbázisunkhoz, fel kell venni a MySQL drivert és az adatbázis beállításokat. Ezekkel egy új JDBC interpretert készítünk, de előbb hozzá kell adnunk egy unsecure maven repositoryt is a Zeppelinhez.
+In order for Zeppelin to access our database, the MySQL driver and database settings must be included. With these we create a new JDBC interpreter, but first we also need to add an unsecure maven repository to Zeppelin.
 
 [Settings](https://zeppelin.apache.org/docs/0.8.0/interpreter/jdbc.html)
 
-Válasszuk jobb felül az anonymus ra kattintva az Interpreter opciót.
+Select the Interpreter option by clicking on anonymous at the top right.
 
 ![Interpreters](screens/zeppelin/interpreters.png)
 
-Először a maven repót adjuk hozzá, ehhez jobb felül válasszuk a repositories, majd a megjelenő lista mellett a + gombot. A formot töltsük ki a képen láthatók szerint és mentsük el. A használt mvn repository url.
+We first add the maven repo, select repositories at the top right, then the + button next to the list that appears. Fill in the form as shown in the picture and save it. The mvn repository url used:
 
 ```sh
 http://insecure.repo1.maven.org/maven2/
@@ -259,7 +259,7 @@ http://insecure.repo1.maven.org/maven2/
 
 ![Interpreters](screens/zeppelin/maven.png)
 
-Majd jobb felül a create gombot nyomjuk meg és vegyünk fel egy új jdbc típusú interpretert az alábbi adatokkal.
+Then press the create button at the top right and add a new jdbc interpreter with the data below.
 
 * **default.driver**: com.mysql.jdbc.Driver
 * **default.password**: root
@@ -270,39 +270,39 @@ Majd jobb felül a create gombot nyomjuk meg és vegyünk fel egy új jdbc típu
 ![Interpreters](screens/zeppelin/new1.png)
 ![Interpreters](screens/zeppelin/new2.png)
 
-Alul a save gombbal mentsük el.
+Save with the save button at the bottom.
 
-#### Néhány egyszerű lekérdezés
+#### Some simple queries
 
-Hozzunk létre egy új notebookot az újonnan felvett interpreterünkkel és próbáljunk ki néhány egyszerű lekérdezést.
+Let’s create a new notebook with our newly added interpreter and try some simple queries.
 
-Akciófilmek listája:
+List of action movies:
 
 ```sql
 SELECT * FROM movies WHERE genres LIKE '%Action%';
 ```
 
-Értékelések eloszlása:
+Distribution of ratings:
 
 ```sql
 SELECT rating, count(*) FROM ratings GROUP BY rating;
 ```
 
-Filmek száma műfajonként:
+Number of movies by genre:
 
 ```sql
 SELECT count(*) as count, genres from movies group by genres order by count desc
 ```
 
-*Ellenőrzés:* A lekérdezések eredményeiről helyezz el egy-egy képernyőképet a jegyzőkönyvben!
+*Check:* Place 1-1 screenshot of the results of the queries in the report.
 
-### 3. Feladat - Superset dashboardok
+### Task 3. - Superset dashboards
 
 [Superset UI](http://localhost:16000/login/)
 
-#### 3.1 Feladat - Kapcsolódás adatbázishoz
+#### Task 3.1 - Connecting to database
 
-Supersetbe belépve a Sources / Databases felületen a + gombbal új adatforrást veszünk fel.
+Entering Superset in the Sources / Databases interface, the + button is used to add a new data source.
 
 * Database: hadooplabor
 * SQLAlchemy URI: mysql://root:root@db:13306/hadooplabor
@@ -310,50 +310,50 @@ Supersetbe belépve a Sources / Databases felületen a + gombbal új adatforrás
 
 ![Interpreters](screens/superset/database.png)
 
-Alul a save gombbal mentsük ezt el. Ha a Superset magától nem fetchelné a táblákat akkor a 3 táblánkat is külön fel kell venni a Sources / tables müben hasonló módon.
+Save this at the bottom with the save button. If Superset does not fetch the tables by itself, our 3 tables must be added separately in the Sources / tables menu in a similar way.
 
-Új grafikont a Charts menüre kattintva tudunk felvenni, ahol a varázsló végigvezet minket a lépéseken. Fontos, hogy ezen a varázslós felületen csak 1 táblából tudunk dolgozni. Ha joinolni szeretnénk, akkor az SQL Lab-ban kell kézzel megírjuk az SQL lekérdezést, majd annak az eredményét egy view-hoz hasonlóan tudjuk bevinni a chart szerkesztőbe.
+You can add a new chart by clicking on the Charts menu, where the wizard will guide you through the steps. Importantly, we can only work from 1 table in this wizard interface. If you want to join tables, you have to manually write the SQL query in SQL Lab, and then you can enter its result into the chart editor like a view.
 
-Készítsük el ugyanazokat a kimutatásokat, mint Zeppelinben!
+Make the same statements as in Zeppelin!
 
-*Ellenőrzés:* A lekérdezések eredményeiről helyezz el egy-egy képernyőképet a jegyzőkönyvben!
+*Check:* Place 1-1 screenshot of the results of the queries in the report.
 
-## Önálló feladatok
+## Individual tasks
 
-### 1. Feladat - Users dataset betöltése Apache NiFi segítségével
+### Task 1. - Loading Users dataset with Apache NiFi
 
-Töltsd be a `users` adatállományt is a MySQL adatbázisba!
-A betöltés során szűrd ki a 18 év alatti felhasználókat.
-Az adatszerkezet leírása a repository `data/README` fájljában található. **FIGYELEM! A szeparator karekter: ,**
+Also load the `users` dataset to the MySQL database!
+Filter users under age of 18 during loading.
+A description of the data structure can be found in the repository's `data/README` file. **ATTENTION! The separator character: ,**
 
-Tippek:
+Tips:
 
-* A 18 éven aluliak kiszűréséhez jól jöhet a RouteText processzor
+* The RouteText processor can be useful for filtering under age of 18.
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
+*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared.
 
-### 2. Feladat - Zeppelin elemzések
+### Task 2. - Zeppelin analysis
 
-Készíts tetszőleges elemzéseket az adathalmazon Zeppelin segitségével. Legalább két elemzést készíts el. Használj különböző grafikon típusokat. Néhány tipp:
+Create arbitrary analyzes on the data set with Zeppelin. Make at least two analyzes. Use different chart types. Some tips:
 
-* Írj egy lekérdezést, amely kiírja a 10 legtöbbet értékelt film címét, azonosítóját és a rá érkezett értékelések számát! Vizualizald az eredmenyeket!
+* Write a query that lists the titles, IDs, and number of ratings for the 10 most rated movies! Visualize the results!
 
-* Írj egy lekérdezést, amely kiírja a 10 legtöbb 1-es osztályzattal értékelt film címét, azonosítóját és a rá érkezett 1-es értékelések számát! Vizualizald az eredmenyeket!
+* Write a query that lists the titles, IDs, and number of ratings received for the 10 most 1-rated movies! Visualize the results!
 
-* Írj egy lekérdezést, amely kiírja a programozók 3 kedvenc filmjének címét, azonosítóját és a rájuk érkezett 5-ös értékelések számát! (Amelyek a legtöbb 5-ös szavazatot kapták.) Vizualizald az eredményeket!
+* Write a query that lists the titles, IDs, and number of ratings received by programmers for their 3 favorite 5-rated movies! (Which received the most 5-rates) Visualize the results!
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el képernyőképeket az elemzésekről és 1-1 mondatban írd le mit látunk a képen.
+*Check:* Place a screenshot of eaxh analysis and explain in 1-1 sentence what we can see on the picture.
 
-### 3. Feladat - Superset elemzések
+### Task 3. - Superset analysis
 
-Készíts tetszőleges elemzéseket az adathalmazon Superset segitségével. Legalább két elemzést készíts el. Használj különböző grafikon típusokat. Az előző példák is használhatók, sőt az is jó ha ugyanazt a két elemzést megcsinálod, mindkét eszközzel. Vizualizald az eredményeket!
+Create arbitrary analyzes on the dataset using Superset. Make at least two analyzes. Use different chart types. The previous examples can be used, and it’s even good to do the same two analyzes with both tools. Visualize the results!
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el képernyőképeket az elemzésekről és 1-1 mondatban írd le mit látunk a képen.
+*Check:* Place a screenshot of eaxh analysis and explain in 1-1 sentence what we can see on the picture.
 
-## Értékelés
+## Evaluation
 
-A vezetett rész az elégséges határa, a 3 egyéni feladat megoldása mindegyik +1 jegyet jelent, azaz:
-* Vezetett rész + 1 megoldott egyéni = 3
-* Vezetett rész + 2 megoldott egyéni = 4
-* Vezetett rész + összes megoldott egyéni = 5
+Finishing the common part is the minimum for mark 2, the solution of the 3 individual tasks means each +1 grade, ie:
+* Common part + 1 solved individual task = 3
+* Common part + 2 solved individual tasks = 4
+* Common part + all solved individual tasks = 5
 
