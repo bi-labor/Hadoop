@@ -126,7 +126,7 @@ exit
 #### Task 1.1 - Loading Movies dataset
 
 The first dataset contains data from some popular movies.
-Using Apache NiFi, load the contents of the file into MySQL, in the `movies` table. Separator character: ::
+Using Apache NiFi, load the contents of the file into MySQL, in the `movies` table. Separator character is ::
 
 The first step is to create the appropriate database table:
 
@@ -148,7 +148,7 @@ CREATE TABLE movies (
 ```
 
 For data loading, we will create a simple flow in NiFi. The `GetFile` processor is responsible for reading the data, while the `PutSQL` processor is responsible for writing the data. These can be added to the Nifi interface by dragging the 'Processors' icon on the top toolbar to the canvas. The pop-up window lists all available processor types, from which we need to find the right one.
-Configure these so that `GetFile` observes the` / opt / nifi / movies` folder. To access the settings, double-click on a processor or right-click -> configure.
+Configure these so that `GetFile` observes the `/opt/nifi/movies` folder. To access the settings, double-click on a processor or right-click -> configure.
 
 ![Flow](screens/nifi/getfile-settings.png)
 
