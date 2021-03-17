@@ -158,8 +158,8 @@ A fájl felolvasását követően bontsuk azt sorokra a `SplitText` processzorra
 
 Az egyes sorokat SQL INSERT statementekké kell alakítanunk, ehhez használhatjuk a `ReplaceText` processzort, de előbb a sorban található értékeket FlowFile attribútummá kell alakítanunk az `ExtractText` processzorral. Az ExtractText-nél használt regexek (az új elemeket a Properties tab jobb felső sarkában lévő + gombal adhatjuk hozzá):
 
-* genres: `[0-9]+::.+::(.+)`
-* movieId: `(.*)::.*::.*`
+* genres: `[0-9]+::.*::(.*)`
+* movieId: `([0-9]+)::.*::.*`
 * title: `[0-9]+::(.*)::.*`
 
 ![Flow](screens/nifi/extracttext-properties.png)
@@ -328,7 +328,8 @@ Az adatszerkezet leírása a repository `data/README` fájljában található. *
 
 Tippek:
 
-* A 18 éven aluliak kiszűréséhez jól jöhet a RouteText processzor
+* A 18 éven aluliak kiszűréséhez jól jöhet a [RouteText](https://nifi.apache.org/docs/nifi-docs/components/org.apache.nifi/nifi-standard-nar/1.5.0/org.apache.nifi.processors.standard.RouteText/index.html) processzor
+* Reguláris kifejezéssel vagy [NiFi Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html) segítségével érdemes megoldani a szűrést, új property felvételével.
 
 *Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
 
