@@ -63,10 +63,10 @@ docker exec -it bilabor_superset_1 superset-init
 
 At first startup, the first command downloads the required images and then initializes and starts the four services based on the `docker-compose.yml` file. [More details](https://docs.docker.com/compose/compose-file/compose-file-v3/)
 
-You can see that the ports of MySQL default `3306` also the Superset, Zeppelin and NiFi default `8088` and `8080` ports are connected to the `13306`, `16000`, `16001` and `16002` ports on our own machine.
+You can see that the ports of the Superset, Zeppelin and NiFi default `8088` and `8080` ports are connected to the `16000`, `16001` and `16002` ports on our own machine.
 (To avoid port collisions with possible local instances and previous Docker history.
 In the event of a collision, the lines `X:Y` in the `docker-compose.yml` file have to be rewritten to the desired port `X` and the container should be restarted.
-In this case, the new port numbers should be used in the browser when opening the UI of the Superset, Zeppelin and NiFi. Furthermore when setting the MySQL port during the lab, the new port have to be used.)
+In this case, the new port numbers should be used in the browser when opening the UI of the Superset, Zeppelin and NiFi.)
 
 The root user password is set on MySQL and the database also. 
 
@@ -178,7 +178,7 @@ INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'
 
 The completed INSERT statements can be run with the PutSQL processor and our data records will be saved in the database. The PutSQL processor needs a NiFi server for the DB connection with its settings:
 
-* **connection URL**: jdbc:mysql://db:13306/hadooplabor
+* **connection URL**: jdbc:mysql://db:3306/hadooplabor
 * **Driver Class Name**: com.mysql.jdbc.Driver
 * **Driver location**: /opt/nifi/mysql
 * **User**: root
@@ -264,7 +264,7 @@ Then press the create button at the top right and add a new jdbc interpreter wit
 * **default.driver**: com.mysql.jdbc.Driver
 * **default.password**: root
 * **default.user**: root
-* **default.url**: jdbc:mysql://db:13306/hadooplabor
+* **default.url**: jdbc:mysql://db:3306/hadooplabor
 * **artifact**: mysql:mysql-connector-java:jar:5.1.45
 
 ![Interpreters](screens/zeppelin/new1.png)
@@ -305,7 +305,7 @@ SELECT count(*) as count, genres from movies group by genres order by count desc
 Entering Superset in the Sources / Databases interface, the + button is used to add a new data source.
 
 * Database: hadooplabor
-* SQLAlchemy URI: mysql://root:root@db:13306/hadooplabor
+* SQLAlchemy URI: mysql://root:root@db:3306/hadooplabor
 * Expose in SQL Lab: true
 
 ![Interpreters](screens/superset/database.png)
