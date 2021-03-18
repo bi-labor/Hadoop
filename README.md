@@ -158,8 +158,8 @@ After reading the file, split it into lines with the `SplitText` processor.
 
 Each line must be converted to SQL INSERT statements, using the `ReplaceText` processor, but first the values in the line must be converted to a FlowFile attribute with the `ExtractText` processor. Regexes used for ExtractText (new items can be added with the + button in the upper right corner of the Properties tab):
 
-* genres: `[0-9]+::.+::(.+)`
-* movieId: `(.*)::.*::.*`
+* genres: `[0-9]+::.*::(.*)`
+* movieId: `([0-9]+)::.*::.*`
 * title: `[0-9]+::(.*)::.*`
 
 ![Flow](screens/nifi/extracttext-properties.png)
@@ -328,7 +328,8 @@ A description of the data structure can be found in the repository's `data/READM
 
 Tips:
 
-* The RouteText processor can be useful for filtering under age of 18.
+* The [RouteText](https://nifi.apache.org/docs/nifi-docs/components/org.apache.nifi/nifi-standard-nar/1.5.0/org.apache.nifi.processors.standard.RouteText/index.html) processor can be useful for filtering under age of 18.
+* It is suggested to solve the filtering with regular expression or [NiFi Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html) by adding a new property.
 
 *Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared.
 
