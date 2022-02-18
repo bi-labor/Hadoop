@@ -59,10 +59,12 @@ Otthoni környezetben a docker-compose.yml használandó. Töltsük le és mapp�
 ```sh
 docker-compose -p bilabor up -d
 
-docker exec -it bilabor_superset_1 superset-init
+docker exec -it bilabor-superset-1 superset-init
 ```
 
 Első indításkor az első parancs letölti az szükséges image-ket, majd a docker-compose.yml fájl alapján inicializálja és elindítja a négy szolgáltatást. [További részletek](https://docs.docker.com/compose/compose-file/compose-file-v3/)
+
+> Figyelem! Régebbi Docker Desktop verziókban a konténernévben a szeparátorkarakter - helyett: _
 
 Látható, hogy a Superset, Zeppelin és NiFi default `8088`, illetve `8080` portjai vannak összekapcsolva a saját gépünkön a `16000`, `16001` és `16002` portokkal. 
 (Esetleges lokális példányokkal és korábbi Docker előzményekkel való portütközések elkerülése végett.
@@ -86,7 +88,7 @@ Ismerkedjünk meg az adathalmazokkal, felépítésükkel, ID-kkal és szeparáto
 Az adatfileokat le kell töltenünk a NiFi konténerébe, ehhez soronként futtassuk a következő parancsokat:
 
 ```sh
-docker exec -it bilabor_nifi_1 bash
+docker exec -it bilabor-nifi-1 bash
 
 cd ..
 
@@ -131,7 +133,7 @@ Apache NiFi használatával töltsük be a fájl tartalmát MySQL-be, a `movies`
 Első lépésként létre kell hoznunk a megfelelő adatbázistáblákat:
 
 ```sh
-docker exec -it bilabor_db_1 bash
+docker exec -it bilabor-db-1 bash
 
 mysql -uroot -proot
 
