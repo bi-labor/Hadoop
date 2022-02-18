@@ -58,8 +58,10 @@ During the distance learning, use the docker-compose.yml file. Download this fil
 ```sh
 docker-compose -p bilabor up -d
 
-docker exec -it bilabor_superset_1 superset-init
+docker exec -it bilabor-superset-1 superset-init
 ```
+
+> Attention! In older Docker Desktop versions the container name separator character is not - but: _
 
 At first startup, the first command downloads the required images and then initializes and starts the four services based on the `docker-compose.yml` file. [More details](https://docs.docker.com/compose/compose-file/compose-file-v3/)
 
@@ -86,7 +88,7 @@ Check the datasets, their structure, IDs, and separator characters. [MovieLens S
 We need to download the data files to the NiFi container by running the following commands line by line:
 
 ```sh
-docker exec -it bilabor_nifi_1 bash
+docker exec -it bilabor-nifi-1 bash
 
 cd ..
 
@@ -131,7 +133,7 @@ Using Apache NiFi, load the contents of the file into MySQL, in the `movies` tab
 The first step is to create the appropriate database table:
 
 ```sh
-docker exec -it bilabor_db_1 bash
+docker exec -it bilabor-db-1 bash
 
 mysql -uroot -proot
 
