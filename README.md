@@ -35,9 +35,11 @@ Az Apache Zeppelin egy web alapú notebook eszköz. Könnyen bővíthető archit
 
 ### 0. Feladat - környezet előkészítése
 
+> Figyelem! A környezet előkészítése a szokásosnál több időt (30-60 perc) és komolyabb rendszerkövetelményeket (min. 8 GB RAM javasolt, 15-20 GB szabad hely a rendszermeghajtón) vesz igénybe. Telepítési és kompatibilitási nehézségek miatt sem a laborban, sem a cloudban nem tudjuk előkészíteni a környezetet. A labor során érdekes új eszközöket, szoftvereket fogunk bemutatni, reméljük a fentiek mellett is hasznosnak találjátok majd az itt látottakat!
+
 A labor során az összes szükséges eszközt Docker konténerként fogjuk futtatni Docker Compose segítségével, így ezeknek elérhetőnek kell lenniük a környezetünkben. 
 
-Töltsük le és telepítsük a [Docker Desktop](https://www.docker.com/products/docker-desktop) alkalmazást.
+Töltsük le és telepítsük a [Docker Desktop](https://www.docker.com/products/docker-desktop) alkalmazást ([követelmények](https://docs.docker.com/desktop/install/windows-install/)).
 
 A Docker egy konténer alapú, kis overheadű virtualizációs technológia. Segítségével Docker Image-kből Docker konténereket tudunk indítani, mely egy-egy szolgáltatást, szoftvert tartalmaznak. Néhány alapvető paranccsal termnálból menedzselhetjük ezeket.
 
@@ -58,13 +60,9 @@ Otthoni környezetben a docker-compose.yml használandó. Töltsük le és mapp�
 
 ```sh
 docker-compose -p bilabor up -d
-
-docker exec -it bilabor-superset-1 superset-init
 ```
 
-Első indításkor az első parancs letölti az szükséges image-ket, majd a docker-compose.yml fájl alapján inicializálja és elindítja a négy szolgáltatást. [További részletek](https://docs.docker.com/compose/compose-file/compose-file-v3/)
-
-> Figyelem! Régebbi Docker Desktop verziókban a konténernévben a szeparátorkarakter - helyett: _
+Első indításkor az első parancs letölti az szükséges image-ket, majd a docker-compose.yml fájl alapján elindítja a négy szolgáltatást. [További részletek](https://docs.docker.com/compose/compose-file/compose-file-v3/)
 
 Látható, hogy a Superset, Zeppelin és NiFi default `8088`, illetve `8080` portjai vannak összekapcsolva a saját gépünkön a `16000`, `16001` és `16002` portokkal. 
 (Esetleges lokális példányokkal és korábbi Docker előzményekkel való portütközések elkerülése végett.
@@ -73,7 +71,16 @@ Ezesetben a böngészőben az új portokon kell megnyitni a Superset, Zeppelin �
 
 A MySQL konténeren beállításra kerül az adatbázis és a root felhasználó jelszava. 
 
+> Figyelem! Az image-k letöltése, kicsomgalolása, konfigurálása és elindítása akár 30-45 perc is lehet.
+
+```sh
+docker exec -it bilabor-superset-1 superset-init
+```
+
 A második parancs során fog a Superset inicializálódni, többek közt itt adható meg az admin felhasználó neve és jelszava, amivel később a felületen be tudunk lépni.
+
+> Figyelem! A superset inicializálása akár 10-15 perc is lehet. Eközben kell megadni az admin felhasználó adatait. Érdemes felhasználónév-jelszó párosnak pl. az admin/admin kombinációt választani, később szükség lesz rá a belépés során.  Régebbi Docker Desktop verziókban a konténernévben a szeparátorkarakter - helyett: _
+
 
 **Figyelem! A jegyzőkönyvbe beillesztett képernyőképeken minden esetben látszódjon a dátum és idő (pl. a tálcán), illetve a Név-Neptun kód páros (pl. Jegyzettömbben).**
 
@@ -125,10 +132,12 @@ wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-conn
 exit
 ```
 
+> Figyelem! Ellenőrizzük, hogy a 4 fájl letöltése valóban sikerült-e! Ha nem, akkor a megfelelő mappában adjuk ki újra a wget kezdetű parancsot.
+
 #### 1.1 Feladat - Movies dataset betöltése
 
 Az első betöltendő adathalmaz néhány népszerű film adatait tartalmazza.
-Apache NiFi használatával töltsük be a fájl tartalmát MySQL-be, a `movies` táblába. (szeparator karakter: ::)
+Apache NiFi használatával töltsük be a fájl tartalmát MySQL-be, a `movies` táblába. Szeparator karakter: ::
 
 Első lépésként létre kell hoznunk a megfelelő adatbázistáblákat:
 
@@ -150,6 +159,7 @@ CREATE TABLE movies (
 ```
 
 Az adatbetöltéshez egy egyszerű workflowt fogunk létrehozni NiFi-ben. Az adatok beolvasásárért a `GetFile`, míg az SQL-be írásért a `PutSQL` processzor a felelős. Ezeket a nifi felületén a felső eszköztár balodlali 'Processors' ikonját a canvas-re húzva adhatjuk hozzá. A felugró ablak felsorolja az osszes elérhető processzor típust, ezekből kell a megfelelőt kikeresnünk.
+
 Konfiguráljuk be ezeket úgy, hogy a `GetFile` a `/opt/nifi/movies` mappát figyelje. A beállítások eléréséhez kattintsunk kétszer egy processzoron, vagy jobbklikk -> configure.
 
 ![Flow](screens/nifi/getfile-settings.png)
@@ -180,14 +190,9 @@ INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'
 
 Az elkészült INSERT statementeket a PutSQL processzorral lefuttathatjuk és ezzel az adatrekordjaink mentésre kerülnek az adatbázisba. A PutSQL processzornak szüksége van egy NiFi servicere a DB csatlakozáshoz ennek a beállításai:
 
-* **connection URL**: jdbc:mysql://db:3306/hadooplabor
-* **Driver Class Name**: com.mysql.jdbc.Driver
-* **Driver location**: /opt/nifi/mysql
-* **User**: root
-* **Password**: root
 * **Support Fragmented Transactions**: false
 
-A beállításhoz a processor Properties tabján adjunk hozzá új adatbázis szervice-t.
+A beállításhoz a processor Properties tabján adjunk hozzá új adatbázis szervice-t (JDBC Conncetion Pool).
 
 ![Flow](screens/nifi/db-setup-1.png)
 
@@ -195,24 +200,31 @@ Ezt követően az új service mellett kattintsunk a jobbra mutató nyilacskára.
 ![Flow](screens/nifi/db-setup-2.png)
 
 A kilistázott 1 db controller servicenél válasszuk a fogaskerék ikonnal a beállításokat, majd adjuk meg a szükséges adatokat.
+
+* **connection URL**: jdbc:mysql://db:3306/hadooplabor
+* **Driver Class Name**: com.mysql.jdbc.Driver
+* **Driver location**: /opt/nifi/mysql
+* **User**: root
+* **Password**: root
+
 ![Flow](screens/nifi/db-setup-3.png)
 
 Végül a villám ikonnal aktiváljuk az adatbázis kapcsolatot.
 ![Flow](screens/nifi/db-setup-4.png)
 
-Ezt követően már csak össze kell kössük a processorainkat, létrehozva a Connectionoket. Ezt az egérrel tudjuk megtenni. Egy processzor fölé víve az egeret megjelenik egy nyilacskás ikon, azt kell a cél processzorra húzni. A felugró ablakban ki kell választani, hogy a processzor mely kimenetét szeretnénk bekötni. Nagyon fontos, hogy a nem használt kimeneteket a processzor beállítások nézet első tabján auto terminate-re kell jelölni, vagy a processzor nem fog elindulni. Ha bekötetlen és auto terminálatlan kimenetünk van azt a processzoron megjelenő sárga háromszög is jelzi.
+Ezt követően már csak össze kell kössük a processorainkat, létrehozva a Connectionoket. Ezt az egérrel tudjuk megtenni. Egy processzor fölé víve az egeret megjelenik egy nyilacskás ikon, azt kell a cél processzorra húzni. A felugró ablakban ki kell választani, hogy a processzor mely kimenetét szeretnénk bekötni. Nagyon fontos, hogy a nem használt kimeneteket az összes processzornál a beállítások nézet első tabján auto terminate-re kell jelölni, vagy a processzor nem fog elindulni. Ha bekötetlen és auto terminálatlan kimenetünk van azt a processzoron megjelenő sárga háromszög is jelzi.
 
 Autoterminate kimenetek: ![Flow](screens/nifi/splittext-autoterminate.png)
 
 A kiválasztott kimenet neve a kapcsolaton megjelenő kis dobozon leolvasható, ez látszik az alábbi ábrán is, ez alapján kell beállítani a flow-t. Az elkészült teljes flow: ![Flow](screens/nifi/flow.png)
 
-Ha mindennel megvagyunk elindíthatjuk a processzorokat. Ezt megtehetjük egyesével vagy mind egyszerre. A processzoron történő jobbklikkes menüben van lehetőség a processzorok indítására és leállítására, vagy a canvas bal oldal a kijelölt processzorok egyszerre is indíthatók.
+Ha mindennel megvagyunk elindíthatjuk a processzorokat. Ezt megtehetjük egyesével vagy mind egyszerre. A processzoron történő jobbklikkes menüben van lehetőség a processzorok indítására és leállítására, vagy a canvas bal oldal a kijelölt processzorok egyszerre is indíthatók. Indítsuk inkább el az egész flow-t 1 gombnyomással.
 
 **Megjegyzés:** Az SQL insertnél lesznek hibák, mert nem escapeltük az aposztróf és idézőjel karaktereket. Ez most nem gond. ReplaceText-el egyszerűen megoldható.
 
 A flow-n végigkövethetjük, hogy mi történik a fájlunkkal. Minden processzor kiírja a felületen, hogy hány rekord érkezett be és ment tovább. Ezt leglátványosabban a splittextnél láthatjuk ahol 1 FlowFile megy be és 3884 jön ki. Ha megnézzük a movies.dat fájlt annak pont ennyi sora volt, így biztosan tudhatjuk, hogy a SplitText jól működött.
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok (3426 sornak kell lennie).
+*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok (select * from movies; 3426 sornak kell lennie). Az adatok áttöltése akár 30-60 másodperc is lehet, várjuk meg a végét!
 
 #### 1.2 Feladat - Ratings dataset betöltése
 
@@ -228,16 +240,18 @@ CREATE TABLE ratings (
 );
 ```
 
+Ha menteni szeretnénk az elkészített flow és később visszatölteni, akkor készítsünk belőle template-t és töltsük le az elkészült sablont a Template menüből.
+
 Annak érdekében, hogy átláthatóbb legyen a NiFi Flow konfigurációnk, hozzunk létre egy új Process Groupot, ahova bemásoljuk az eddigi Processorokat.
 Ezen kívül hozzunk létre egy másik Process Groupot is, az aktuális feladat számára.
 
-Itt is hasonló megoldást fogunk követni, mint az előzőekben.
+Vagy CTRL+A kombinációval jelöljük ki az összes processzort, nyomjunk a Group gombra és ebből a groupból készítsünk egy másolatot.
 
-> Figyelem! A Ratings adatfajlban az elvalaszto karakter nem :: hanem !
+Itt is hasonló megoldást fogunk követni, mint az előzőekben. Állítsuk össze ezt a Flow-t is (figyeljünk a GetFile, ExtractText és ReplaceText megfelelő átállítására), futtassuk, majd ellenőrizzük le a kapott eredményt!
 
-Állítsuk össze ezt a Flow-t is, majd ellenőrizzük le a kapott eredményt!
+> Figyelem! A Ratings adatfájlban az elválasztó karakter nem :: hanem !
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
+*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok (select * from ratings;). Az adatok áttöltése akár 1-2 perc is lehet, várjuk meg a végét!
 
 ### 2. Feladat - Zeppelin data exploration
 
@@ -325,7 +339,7 @@ Készítsük el ugyanazokat a kimutatásokat, mint Zeppelinben!
 ### 1. Feladat - Users dataset betöltése Apache NiFi segítségével
 
 Töltsd be a `users` adatállományt is a MySQL adatbázisba!
-A betöltés során szűrd ki a 18 év alatti felhasználókat.
+A betöltés során szűrd ki a 18 év alatti felhasználókat, rájuk most nincs szükség.
 Az adatszerkezet leírása a repository `data/README` fájljában található. **FIGYELEM! A szeparator karekter: ,**
 
 Tippek:
@@ -333,7 +347,7 @@ Tippek:
 * A 18 éven aluliak kiszűréséhez jól jöhet a [RouteText](https://nifi.apache.org/docs/nifi-docs/components/org.apache.nifi/nifi-standard-nar/1.5.0/org.apache.nifi.processors.standard.RouteText/index.html) processzor
 * Reguláris kifejezéssel vagy [NiFi Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html) segítségével érdemes megoldani a szűrést, új property felvételével.
 
-*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, illetve arról, hogy MySQL-ben megjelentek a rekordok.
+*Ellenőrzés:* A jegyzőkönyvben helyezz el egy képet a létrejött flowról, az ExtractText új attribútumairól, a 18 éven aluliak szűrési beállításáról, a ReplaceText Replacement Value mezőjének értékéről, illetve arról, hogy MySQL-ben milyen paranccsal készült el a users tábla, illetve ahogy megjelentek a rekordok (select * from users;). Az adatok áttöltése akár 1-2 perc is lehet, várjuk meg a végét!
 
 ### 2. Feladat - Zeppelin elemzések
 
