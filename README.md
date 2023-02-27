@@ -35,9 +35,11 @@ Apache Zeppelin is a web-based notebook tool. Thanks to its easy-to-expand archi
 
 ### Task 0. - initializing the environment
 
+> Attention! Preparing the environment takes more time than usual (30-60 minutes) and stronger system requirements (minimum 8 GB RAM recommended, 15-20 GB free space on the system drive). Due to installation and compatibility difficulties, we cannot prepare the environment either in the lab or in the cloud. During the lab, we will present interesting new tools and software, we hope you will find what you see here useful in addition to the above!
+
 During the lab, all the services will be run as Docker containers using Docker Compose, so they should be available in our environment.
 
-Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop).
+Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop) ([Requirements](https://docs.docker.com/desktop/install/windows-install/)).
 
 Docker is a container-based, small overhead virtualization technology. 
 With its help, we can launch Docker containers from Docker Images, which contain a service or software. 
@@ -57,11 +59,7 @@ We will use the following containers:
 During the distance learning, use the docker-compose.yml file. Download this file and in its folder, you can start the Docker container with the following commands:
 ```sh
 docker-compose -p bilabor up -d
-
-docker exec -it bilabor-superset-1 superset-init
 ```
-
-> Attention! In older Docker Desktop versions the container name separator character is not - but: _
 
 At first startup, the first command downloads the required images and then initializes and starts the four services based on the `docker-compose.yml` file. [More details](https://docs.docker.com/compose/compose-file/compose-file-v3/)
 
@@ -70,9 +68,17 @@ You can see that the ports of the Superset, Zeppelin and NiFi default `8088` and
 In the event of a collision, the lines `X:Y` in the `docker-compose.yml` file have to be rewritten to the desired port `X` and the container should be restarted.
 In this case, the new port numbers should be used in the browser when opening the UI of the Superset, Zeppelin and NiFi.)
 
-The root user password is set on MySQL and the database also. 
+The root user password is set on MySQL and the database also.
+
+> Attention! Downloading, unpacking, configuring and starting the images can take up to 30-45 minutes.
+
+```sh
+docker exec -it bilabor-superset-1 superset-init
+```
 
 The second command will initialized the Superset, including the admin username and password, which we will use to login to the UI, later.
+
+> Attention! Superset initialization can take up to 10-15 minutes. In the meantime, you must enter the data of the admin user. It is worth using a username-password pair, e.g. admin/admin, you will need it later during login. In older Docker Desktop versions the container name separator character is not - but: _
 
 **Attention! In each task, the inserted screenshots in the report should show the date and time (eg. on the taskbar) and the Name-Neptune code pair (eg. in Notepad).
 **
@@ -124,6 +130,8 @@ wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-conn
 
 exit
 ```
+
+> Attention! Check whether the 4 files have actually been downloaded! If not, enter the wget command again in the appropriate folder.
 
 #### Task 1.1 - Loading Movies dataset
 
@@ -180,14 +188,9 @@ INSERT INTO hadooplabor.movies (id,title,genres) VALUES (${'movieId'},'${'title'
 
 The completed INSERT statements can be run with the PutSQL processor and our data records will be saved in the database. The PutSQL processor needs a NiFi server for the DB connection with its settings:
 
-* **connection URL**: jdbc:mysql://db:3306/hadooplabor
-* **Driver Class Name**: com.mysql.jdbc.Driver
-* **Driver location**: /opt/nifi/mysql
-* **User**: root
-* **Password**: root
 * **Support Fragmented Transactions**: false
 
-To configure, add a new database service in the processor Properties tab.
+To configure, add a new database service in the processor Properties tab. (JDBC Conncetion Pool).
 
 ![Flow](screens/nifi/db-setup-1.png)
 
@@ -195,24 +198,31 @@ Then click on the right arrow next to the new service.
 ![Flow](screens/nifi/db-setup-2.png)
 
 For the 1 controller service listed, select the settings with the gear icon and enter the required data.
+
+* **connection URL**: jdbc:mysql://db:3306/hadooplabor
+* **Driver Class Name**: com.mysql.jdbc.Driver
+* **Driver location**: /opt/nifi/mysql
+* **User**: root
+* **Password**: root
+
 ![Flow](screens/nifi/db-setup-3.png)
 
 Finally, we activate the database connection with the lightning icon.
 ![Flow](screens/nifi/db-setup-4.png)
 
-After that, all we have to do is connect our processors, creating the Connections. We can do this with the mouse. Hovering the mouse over a processor will display an arrow icon, it must be dragged to the target processor. In the pop-up window, select which output of the processor you want to connect. It is very important that unused outputs be marked autoterminate, in the first tab of the processor settings view, or the processor will not start. If you have unconnected and non autoterminated output, this is also indicated by a yellow triangle on the processor.
+After that, all we have to do is connect our processors, creating the Connections. We can do this with the mouse. Hovering the mouse over a processor will display an arrow icon, it must be dragged to the target processor. In the pop-up window, select which output of the processor you want to connect. It is very important that unused outputs have to be marked autoterminate, in the first tab of all processors settings view, or the processor will not start. If you have unconnected and non autoterminated output, this is also indicated by a yellow triangle on the processor.
 
 Autoterminate outputs: ![Flow](screens/nifi/splittext-autoterminate.png)
 
 The name of the selected output can be read on the small box that appears on the connection, this is also shown in the figure below, based on this the flow must be set. Completed total flow:  ![Flow](screens/nifi/flow.png)
 
-When we're done, we can start the processors. We can do this one by one or all at once. You can start and stop the processors in the right-click menu on the processor, or the selected processors can be started at the same time on the left side of the canvas.
+When we're done, we can start the processors. We can do this one by one or all at once. You can start and stop the processors in the right-click menu on the processor, or the selected processors can be started at the same time on the left side of the canvas. Rather, let's start the entire flow with the press of 1 button.
 
 **Note:** There will be errors with the SQL insert because we did not escape the apostrophe and quotation mark characters. This is not a problem now. Can be easily solved with ReplaceText.
 
 Through the flow, we can track what happens to our file. Each processor prints to the interface how many records were received and passed on. This is most spectacular in splittext where 1 FlowFile goes in and 3884 comes out. If we look at the movies.dat file, it had just that many lines, so we can be sure that SplitText worked well.
 
-*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared (3426 lines).
+*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared (select * from movies; 3426 lines). Transferring the data can take up to 30-60 seconds, let's wait for the end!
 
 #### Task 1.2 - Loading Ratings dataset
 
@@ -228,16 +238,18 @@ CREATE TABLE ratings (
 );
 ```
 
+If you want to save the prepared flow and reload it later, make a template of it and download the prepared template from the Template menu.
+
 In order to make our NiFi Flow configuration more transparent, let’s create a new Process Group where we copy the existing Processors.
 In addition, create another Process Group for the current task.
 
-Here, too, we will follow a similar solution as the previous ones.
+Or use the CTRL+A combination to select all the processors, press the Group button and make a copy of this group.
+
+Here, too, we will follow a similar solution as the previous ones. Assemble this Flow as well (pay attention to the appropriate settings of GetFile, ExtractText and ReplaceText), run it, and then check the result!
 
 > Attention! In the Ratings data file, the separator character is not :: but !
 
-Assemble this Flow as well, then check the result obtained!
-
-*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared.
+*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared(select * from ratings;). The transfer of data can take up to 1-2 minutes, wait until the end!
 
 ### Task 2. - Zeppelin data exploration
 
@@ -325,7 +337,7 @@ Make the same statements as in Zeppelin!
 ### Task 1. - Loading Users dataset with Apache NiFi
 
 Also load the `users` dataset to the MySQL database!
-Filter users under age of 18 during loading.
+Filter users under age of 18 during loading, we do not need them now.
 A description of the data structure can be found in the repository's `data/README` file. **ATTENTION! The separator character: ,**
 
 Tips:
@@ -333,7 +345,9 @@ Tips:
 * The [RouteText](https://nifi.apache.org/docs/nifi-docs/components/org.apache.nifi/nifi-standard-nar/1.5.0/org.apache.nifi.processors.standard.RouteText/index.html) processor can be useful for filtering under age of 18.
 * It is suggested to solve the filtering with regular expression or [NiFi Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html) by adding a new property.
 
-*Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared.
+*Check:* Place screenshots in the report of the created flow, the new attributes of ExtractText, the filter setting for under 18, the value of the ReplaceText Replacement Value field, and the command used to create the users table in MySQL, and how the records appeared (select * from users;). Transferring the data can take up to 1-2 minutes, wait for the end!
+
+and 1 screenshot in the report of the MySQL window about the records appeared.
 
 ### Task 2. - Zeppelin analysis
 
