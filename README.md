@@ -80,8 +80,7 @@ The second command will initialized the Superset, including the admin username a
 
 > Attention! Superset initialization can take up to 10-15 minutes. In the meantime, you must enter the data of the admin user. It is worth using a username-password pair, e.g. admin/admin, you will need it later during login. In older Docker Desktop versions the container name separator character is not - but: _
 
-**Attention! In each task, the inserted screenshots in the report should show the date and time (eg. on the taskbar) and the Name-Neptune code pair (eg. in Notepad).
-**
+**Attention! In each task, the inserted screenshots in the report should show the date and time (eg. on the taskbar) and the Name-Neptune code pair (eg. in Notepad).**
 
 ### Task 1. - Data loading with Apache NiFi
 
@@ -220,6 +219,8 @@ When we're done, we can start the processors. We can do this one by one or all a
 
 **Note:** There will be errors with the SQL insert because we did not escape the apostrophe and quotation mark characters. This is not a problem now. Can be easily solved with ReplaceText.
 
+**Warning:** If there was any further issue during the execution and you have to rerun it, please note that in the GetFile processor, the Keep Source File setting is false by default. So you have to wget the movies.dat again into the movies folder. Or set this property to true.
+
 Through the flow, we can track what happens to our file. Each processor prints to the interface how many records were received and passed on. This is most spectacular in splittext where 1 FlowFile goes in and 3884 comes out. If we look at the movies.dat file, it had just that many lines, so we can be sure that SplitText worked well.
 
 *Check:* Place 1 screenshot in the report of the created flow  and 1 screenshot in the report of the MySQL window about the records appeared (select * from movies; 3426 lines). Transferring the data can take up to 30-60 seconds, let's wait for the end!
@@ -346,8 +347,6 @@ Tips:
 * It is suggested to solve the filtering with regular expression or [NiFi Expression Language](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html) by adding a new property.
 
 *Check:* Place screenshots in the report of the created flow, the new attributes of ExtractText, the filter setting for under 18, the value of the ReplaceText Replacement Value field, and the command used to create the users table in MySQL, and how the records appeared (select * from users;). Transferring the data can take up to 1-2 minutes, wait for the end!
-
-and 1 screenshot in the report of the MySQL window about the records appeared.
 
 ### Task 2. - Zeppelin analysis
 
